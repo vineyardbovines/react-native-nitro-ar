@@ -81,4 +81,4 @@ export interface ARViewMethods extends HybridViewMethods {
   isLiDARAvailable(): boolean;
 }
 
-type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;
+export type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;

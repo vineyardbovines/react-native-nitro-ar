@@ -11,6 +11,7 @@ final class HybridARSession: HybridARSessionSpec {
     private var trackingCallback: ((TrackingState, TrackingStateReason) -> Void)?
     private var anchorsCallback: (([any HybridARAnchorSpec], [any HybridARAnchorSpec], [String]) -> Void)?
     private var planesCallback: (([any HybridARPlaneAnchorSpec], [any HybridARPlaneAnchorSpec], [String]) -> Void)?
+    private var meshCallback: (([any HybridARMeshAnchorSpec], [any HybridARMeshAnchorSpec], [String]) -> Void)?
 
     override init() {
         super.init()
@@ -38,6 +39,7 @@ final class HybridARSession: HybridARSessionSpec {
             arConfig.isLightEstimationEnabled = config.lightEstimation ?? true
 
             if #available(iOS 14.0, *) {
+                // Scene depth
                 if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
                     if config.sceneDepth == true {
                         arConfig.frameSemantics.insert(.sceneDepth)
@@ -45,6 +47,35 @@ final class HybridARSession: HybridARSessionSpec {
                     if config.smoothedSceneDepth == true {
                         arConfig.frameSemantics.insert(.smoothedSceneDepth)
                     }
+                }
+
+                // Scene reconstruction (LiDAR mesh)
+                if let sceneRecon = config.sceneReconstruction {
+                    switch sceneRecon {
+                    case .mesh:
+                        if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
+                            arConfig.sceneReconstruction = .mesh
+                        }
+                    case .meshwithclassification:
+                        if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+                            arConfig.sceneReconstruction = .meshWithClassification
+                        }
+                    case .none:
+                        arConfig.sceneReconstruction = []
+                    }
+                }
+
+                // People occlusion
+                if config.peopleOcclusion == true {
+                    if ARWorldTrackingConfiguration.supportsFrameSemantics(.personSegmentationWithDepth) {
+                        arConfig.frameSemantics.insert(.personSegmentationWithDepth)
+                    }
+                }
+
+                // Object occlusion (requires scene reconstruction)
+                if config.objectOcclusion == true {
+                    // Object occlusion is enabled by having scene reconstruction active
+                    // The app can use the mesh for occlusion in rendering
                 }
             }
 
@@ -240,8 +271,17 @@ final class HybridARSession: HybridARSessionSpec {
 
     var anchors: [any HybridARAnchorSpec] {
         session.currentFrame?.anchors
-            .filter { !($0 is ARPlaneAnchor) }
+            .filter { anchor in
+                !(anchor is ARPlaneAnchor) && !isMeshAnchor(anchor)
+            }
             .map { HybridARAnchor(anchor: $0, session: session) } ?? []
+    }
+
+    private func isMeshAnchor(_ anchor: ARAnchor) -> Bool {
+        if #available(iOS 13.4, *) {
+            return anchor is ARMeshAnchor
+        }
+        return false
     }
 
     var planeAnchors: [any HybridARPlaneAnchorSpec] {
@@ -314,6 +354,42 @@ final class HybridARSession: HybridARSessionSpec {
         }
     }
 
+    // MARK: - LiDAR / Scene Mesh
+
+    func getLiDARCapabilities() throws -> LiDARCapabilities {
+        var isAvailable = false
+        var supportsSceneReconstruction = false
+        var supportsSceneDepth = false
+
+        if #available(iOS 14.0, *) {
+            supportsSceneReconstruction = ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
+            supportsSceneDepth = ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth)
+            isAvailable = supportsSceneReconstruction || supportsSceneDepth
+        }
+
+        return LiDARCapabilities(
+            isAvailable: isAvailable,
+            supportsSceneReconstruction: supportsSceneReconstruction,
+            supportsSceneDepth: supportsSceneDepth
+        )
+    }
+
+    var meshAnchors: [any HybridARMeshAnchorSpec] {
+        guard #available(iOS 13.4, *) else { return [] }
+        return session.currentFrame?.anchors
+            .compactMap { $0 as? ARMeshAnchor }
+            .map { HybridARMeshAnchor(anchor: $0) } ?? []
+    }
+
+    func onMeshUpdated(
+        callback: @escaping ([any HybridARMeshAnchorSpec], [any HybridARMeshAnchorSpec], [String]) -> Void
+    ) throws -> () -> Void {
+        meshCallback = callback
+        return { [weak self] in
+            self?.meshCallback = nil
+        }
+    }
+
     // Called by delegate
     func handleFrameUpdate(_ frame: ARFrame) {
         frameCallback?(HybridARFrame(frame: frame))
@@ -329,13 +405,13 @@ final class HybridARSession: HybridARSessionSpec {
         removed: [ARAnchor]
     ) {
         let addedHybrid = added
-            .filter { !($0 is ARPlaneAnchor) }
+            .filter { !($0 is ARPlaneAnchor) && !isMeshAnchor($0) }
             .map { HybridARAnchor(anchor: $0, session: session) }
         let updatedHybrid = updated
-            .filter { !($0 is ARPlaneAnchor) }
+            .filter { !($0 is ARPlaneAnchor) && !isMeshAnchor($0) }
             .map { HybridARAnchor(anchor: $0, session: session) }
         let removedIds = removed
-            .filter { !($0 is ARPlaneAnchor) }
+            .filter { !($0 is ARPlaneAnchor) && !isMeshAnchor($0) }
             .map { $0.identifier.uuidString }
 
         if !addedHybrid.isEmpty || !updatedHybrid.isEmpty || !removedIds.isEmpty {
@@ -354,6 +430,23 @@ final class HybridARSession: HybridARSessionSpec {
 
         if !addedPlanes.isEmpty || !updatedPlanes.isEmpty || !removedPlaneIds.isEmpty {
             planesCallback?(addedPlanes, updatedPlanes, removedPlaneIds)
+        }
+
+        // Handle mesh anchors (iOS 13.4+)
+        if #available(iOS 13.4, *) {
+            let addedMeshes = added
+                .compactMap { $0 as? ARMeshAnchor }
+                .map { HybridARMeshAnchor(anchor: $0) }
+            let updatedMeshes = updated
+                .compactMap { $0 as? ARMeshAnchor }
+                .map { HybridARMeshAnchor(anchor: $0) }
+            let removedMeshIds = removed
+                .compactMap { $0 as? ARMeshAnchor }
+                .map { $0.identifier.uuidString }
+
+            if !addedMeshes.isEmpty || !updatedMeshes.isEmpty || !removedMeshIds.isEmpty {
+                meshCallback?(addedMeshes, updatedMeshes, removedMeshIds)
+            }
         }
     }
 }

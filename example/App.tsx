@@ -152,6 +152,13 @@ export default function App() {
     if (!arView) return;
 
     try {
+      // Check for LiDAR support
+      const lidarAvailable = arView.isLiDARAvailable();
+      setHasLiDAR(lidarAvailable);
+      if (lidarAvailable) {
+        console.log("LiDAR detected - enabling scene reconstruction");
+      }
+
       arView.startSession();
       setIsRunning(true);
     } catch (e) {
@@ -283,6 +290,10 @@ export default function App() {
         showPlanes={true}
         showFeaturePoints={false}
         autoenablesDefaultLighting={true}
+        // LiDAR features (only work on devices with LiDAR)
+        sceneReconstruction={hasLiDAR ? "mesh" : undefined}
+        showSceneMesh={showMesh}
+        sceneDepth={hasLiDAR}
         hybridRef={callback((ref) => {
           arViewRef.current = ref;
         })}
