@@ -97,6 +97,31 @@ using namespace margelo::nitro::ar::views;
     swiftPart.setAutoenablesDefaultLighting(newViewProps.autoenablesDefaultLighting.value);
     newViewProps.autoenablesDefaultLighting.isDirty = false;
   }
+  // sceneReconstruction: optional
+  if (newViewProps.sceneReconstruction.isDirty) {
+    swiftPart.setSceneReconstruction(newViewProps.sceneReconstruction.value);
+    newViewProps.sceneReconstruction.isDirty = false;
+  }
+  // showSceneMesh: optional
+  if (newViewProps.showSceneMesh.isDirty) {
+    swiftPart.setShowSceneMesh(newViewProps.showSceneMesh.value);
+    newViewProps.showSceneMesh.isDirty = false;
+  }
+  // sceneDepth: optional
+  if (newViewProps.sceneDepth.isDirty) {
+    swiftPart.setSceneDepth(newViewProps.sceneDepth.value);
+    newViewProps.sceneDepth.isDirty = false;
+  }
+  // objectOcclusion: optional
+  if (newViewProps.objectOcclusion.isDirty) {
+    swiftPart.setObjectOcclusion(newViewProps.objectOcclusion.value);
+    newViewProps.objectOcclusion.isDirty = false;
+  }
+  // peopleOcclusion: optional
+  if (newViewProps.peopleOcclusion.isDirty) {
+    swiftPart.setPeopleOcclusion(newViewProps.peopleOcclusion.value);
+    newViewProps.peopleOcclusion.isDirty = false;
+  }
 
   swiftPart.afterUpdate();
 

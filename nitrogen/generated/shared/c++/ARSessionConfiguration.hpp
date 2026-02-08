@@ -34,6 +34,8 @@ namespace margelo::nitro::ar { enum class PlaneDetectionMode; }
 namespace margelo::nitro::ar { enum class EnvironmentTexturing; }
 // Forward declaration of `WorldAlignment` to properly resolve imports.
 namespace margelo::nitro::ar { enum class WorldAlignment; }
+// Forward declaration of `SceneReconstructionMode` to properly resolve imports.
+namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 
 #include "PlaneDetectionMode.hpp"
 #include <vector>
@@ -41,6 +43,7 @@ namespace margelo::nitro::ar { enum class WorldAlignment; }
 #include "EnvironmentTexturing.hpp"
 #include "WorldAlignment.hpp"
 #include <string>
+#include "SceneReconstructionMode.hpp"
 
 namespace margelo::nitro::ar {
 
@@ -56,10 +59,13 @@ namespace margelo::nitro::ar {
     std::optional<EnvironmentTexturing> environmentTexturing     SWIFT_PRIVATE;
     std::optional<WorldAlignment> worldAlignment     SWIFT_PRIVATE;
     std::optional<std::string> initialWorldMap     SWIFT_PRIVATE;
+    std::optional<SceneReconstructionMode> sceneReconstruction     SWIFT_PRIVATE;
+    std::optional<bool> peopleOcclusion     SWIFT_PRIVATE;
+    std::optional<bool> objectOcclusion     SWIFT_PRIVATE;
 
   public:
     ARSessionConfiguration() = default;
-    explicit ARSessionConfiguration(std::optional<std::vector<PlaneDetectionMode>> planeDetection, std::optional<bool> lightEstimation, std::optional<bool> sceneDepth, std::optional<bool> smoothedSceneDepth, std::optional<EnvironmentTexturing> environmentTexturing, std::optional<WorldAlignment> worldAlignment, std::optional<std::string> initialWorldMap): planeDetection(planeDetection), lightEstimation(lightEstimation), sceneDepth(sceneDepth), smoothedSceneDepth(smoothedSceneDepth), environmentTexturing(environmentTexturing), worldAlignment(worldAlignment), initialWorldMap(initialWorldMap) {}
+    explicit ARSessionConfiguration(std::optional<std::vector<PlaneDetectionMode>> planeDetection, std::optional<bool> lightEstimation, std::optional<bool> sceneDepth, std::optional<bool> smoothedSceneDepth, std::optional<EnvironmentTexturing> environmentTexturing, std::optional<WorldAlignment> worldAlignment, std::optional<std::string> initialWorldMap, std::optional<SceneReconstructionMode> sceneReconstruction, std::optional<bool> peopleOcclusion, std::optional<bool> objectOcclusion): planeDetection(planeDetection), lightEstimation(lightEstimation), sceneDepth(sceneDepth), smoothedSceneDepth(smoothedSceneDepth), environmentTexturing(environmentTexturing), worldAlignment(worldAlignment), initialWorldMap(initialWorldMap), sceneReconstruction(sceneReconstruction), peopleOcclusion(peopleOcclusion), objectOcclusion(objectOcclusion) {}
 
   public:
     friend bool operator==(const ARSessionConfiguration& lhs, const ARSessionConfiguration& rhs) = default;
@@ -81,7 +87,10 @@ namespace margelo::nitro {
         JSIConverter<std::optional<bool>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "smoothedSceneDepth"))),
         JSIConverter<std::optional<margelo::nitro::ar::EnvironmentTexturing>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "environmentTexturing"))),
         JSIConverter<std::optional<margelo::nitro::ar::WorldAlignment>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "worldAlignment"))),
-        JSIConverter<std::optional<std::string>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "initialWorldMap")))
+        JSIConverter<std::optional<std::string>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "initialWorldMap"))),
+        JSIConverter<std::optional<margelo::nitro::ar::SceneReconstructionMode>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "sceneReconstruction"))),
+        JSIConverter<std::optional<bool>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "peopleOcclusion"))),
+        JSIConverter<std::optional<bool>>::fromJSI(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "objectOcclusion")))
       );
     }
     static inline jsi::Value toJSI(jsi::Runtime& runtime, const margelo::nitro::ar::ARSessionConfiguration& arg) {
@@ -93,6 +102,9 @@ namespace margelo::nitro {
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "environmentTexturing"), JSIConverter<std::optional<margelo::nitro::ar::EnvironmentTexturing>>::toJSI(runtime, arg.environmentTexturing));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "worldAlignment"), JSIConverter<std::optional<margelo::nitro::ar::WorldAlignment>>::toJSI(runtime, arg.worldAlignment));
       obj.setProperty(runtime, PropNameIDCache::get(runtime, "initialWorldMap"), JSIConverter<std::optional<std::string>>::toJSI(runtime, arg.initialWorldMap));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "sceneReconstruction"), JSIConverter<std::optional<margelo::nitro::ar::SceneReconstructionMode>>::toJSI(runtime, arg.sceneReconstruction));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "peopleOcclusion"), JSIConverter<std::optional<bool>>::toJSI(runtime, arg.peopleOcclusion));
+      obj.setProperty(runtime, PropNameIDCache::get(runtime, "objectOcclusion"), JSIConverter<std::optional<bool>>::toJSI(runtime, arg.objectOcclusion));
       return obj;
     }
     static inline bool canConvert(jsi::Runtime& runtime, const jsi::Value& value) {
@@ -110,6 +122,9 @@ namespace margelo::nitro {
       if (!JSIConverter<std::optional<margelo::nitro::ar::EnvironmentTexturing>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "environmentTexturing")))) return false;
       if (!JSIConverter<std::optional<margelo::nitro::ar::WorldAlignment>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "worldAlignment")))) return false;
       if (!JSIConverter<std::optional<std::string>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "initialWorldMap")))) return false;
+      if (!JSIConverter<std::optional<margelo::nitro::ar::SceneReconstructionMode>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "sceneReconstruction")))) return false;
+      if (!JSIConverter<std::optional<bool>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "peopleOcclusion")))) return false;
+      if (!JSIConverter<std::optional<bool>>::canConvert(runtime, obj.getProperty(runtime, PropNameIDCache::get(runtime, "objectOcclusion")))) return false;
       return true;
     }
   };

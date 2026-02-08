@@ -1,15 +1,11 @@
 import type { HybridObject } from "react-native-nitro-modules";
-import type { ARRaycastResult, RaycastQuery } from "./ARRaycastResult.nitro";
 import type { ARAnchor } from "./ARAnchor.nitro";
+import type { ARFrame } from "./ARFrame.nitro";
 import type { ARMeasurement } from "./ARMeasurement.nitro";
 import type { ARPlaneAnchor } from "./ARPlaneAnchor.nitro";
-import type { ARFrame } from "./ARFrame.nitro";
+import type { ARRaycastResult, RaycastQuery } from "./ARRaycastResult.nitro";
+import type { ARMeshAnchor, LiDARCapabilities, SceneReconstructionMode } from "./ARSceneMesh.nitro";
 import type { ARWorldMap, WorldMappingStatus } from "./ARWorldMap.nitro";
-import type {
-  ARMeshAnchor,
-  SceneReconstructionMode,
-  LiDARCapabilities,
-} from "./ARSceneMesh.nitro";
 
 export interface CameraPose {
   /** Position [x, y, z] */
@@ -96,18 +92,10 @@ export interface ARSession extends HybridObject<{ ios: "swift" }> {
     callback: (state: TrackingState, reason: TrackingStateReason) => void
   ): () => void;
   onAnchorsUpdated(
-    callback: (
-      added: ARAnchor[],
-      updated: ARAnchor[],
-      removed: string[]
-    ) => void
+    callback: (added: ARAnchor[], updated: ARAnchor[], removed: string[]) => void
   ): () => void;
   onPlanesUpdated(
-    callback: (
-      added: ARPlaneAnchor[],
-      updated: ARPlaneAnchor[],
-      removed: string[]
-    ) => void
+    callback: (added: ARPlaneAnchor[], updated: ARPlaneAnchor[], removed: string[]) => void
   ): () => void;
 
   // LiDAR / Scene Mesh
@@ -119,10 +107,6 @@ export interface ARSession extends HybridObject<{ ios: "swift" }> {
 
   /** Callback when mesh anchors are updated */
   onMeshUpdated(
-    callback: (
-      added: ARMeshAnchor[],
-      updated: ARMeshAnchor[],
-      removed: string[]
-    ) => void
+    callback: (added: ARMeshAnchor[], updated: ARMeshAnchor[], removed: string[]) => void
   ): () => void;
 }

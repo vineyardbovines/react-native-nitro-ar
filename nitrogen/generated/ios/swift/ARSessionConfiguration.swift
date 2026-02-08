@@ -18,7 +18,7 @@ public extension ARSessionConfiguration {
   /**
    * Create a new instance of `ARSessionConfiguration`.
    */
-  init(planeDetection: [PlaneDetectionMode]?, lightEstimation: Bool?, sceneDepth: Bool?, smoothedSceneDepth: Bool?, environmentTexturing: EnvironmentTexturing?, worldAlignment: WorldAlignment?, initialWorldMap: String?) {
+  init(planeDetection: [PlaneDetectionMode]?, lightEstimation: Bool?, sceneDepth: Bool?, smoothedSceneDepth: Bool?, environmentTexturing: EnvironmentTexturing?, worldAlignment: WorldAlignment?, initialWorldMap: String?, sceneReconstruction: SceneReconstructionMode?, peopleOcclusion: Bool?, objectOcclusion: Bool?) {
     self.init({ () -> bridge.std__optional_std__vector_PlaneDetectionMode__ in
       if let __unwrappedValue = planeDetection {
         return bridge.create_std__optional_std__vector_PlaneDetectionMode__({ () -> bridge.std__vector_PlaneDetectionMode_ in
@@ -64,6 +64,24 @@ public extension ARSessionConfiguration {
     }(), { () -> bridge.std__optional_std__string_ in
       if let __unwrappedValue = initialWorldMap {
         return bridge.create_std__optional_std__string_(std.string(__unwrappedValue))
+      } else {
+        return .init()
+      }
+    }(), { () -> bridge.std__optional_SceneReconstructionMode_ in
+      if let __unwrappedValue = sceneReconstruction {
+        return bridge.create_std__optional_SceneReconstructionMode_(__unwrappedValue)
+      } else {
+        return .init()
+      }
+    }(), { () -> bridge.std__optional_bool_ in
+      if let __unwrappedValue = peopleOcclusion {
+        return bridge.create_std__optional_bool_(__unwrappedValue)
+      } else {
+        return .init()
+      }
+    }(), { () -> bridge.std__optional_bool_ in
+      if let __unwrappedValue = objectOcclusion {
+        return bridge.create_std__optional_bool_(__unwrappedValue)
       } else {
         return .init()
       }
@@ -134,6 +152,35 @@ public extension ARSessionConfiguration {
       if bridge.has_value_std__optional_std__string_(self.__initialWorldMap) {
         let __unwrapped = bridge.get_std__optional_std__string_(self.__initialWorldMap)
         return String(__unwrapped)
+      } else {
+        return nil
+      }
+    }()
+  }
+  
+  @inline(__always)
+  var sceneReconstruction: SceneReconstructionMode? {
+    return self.__sceneReconstruction.value
+  }
+  
+  @inline(__always)
+  var peopleOcclusion: Bool? {
+    return { () -> Bool? in
+      if bridge.has_value_std__optional_bool_(self.__peopleOcclusion) {
+        let __unwrapped = bridge.get_std__optional_bool_(self.__peopleOcclusion)
+        return __unwrapped
+      } else {
+        return nil
+      }
+    }()
+  }
+  
+  @inline(__always)
+  var objectOcclusion: Bool? {
+    return { () -> Bool? in
+      if bridge.has_value_std__optional_bool_(self.__objectOcclusion) {
+        let __unwrapped = bridge.get_std__optional_bool_(self.__objectOcclusion)
+        return __unwrapped
       } else {
         return nil
       }

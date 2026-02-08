@@ -12,10 +12,13 @@
 // Forward declaration of `HybridARViewSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARViewSpec_cxx; }
 
+// Forward declaration of `SceneReconstructionMode` to properly resolve imports.
+namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `ARViewHitResult` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARViewHitResult; }
 
 #include <optional>
+#include "SceneReconstructionMode.hpp"
 #include <string>
 #include "ARViewHitResult.hpp"
 
@@ -99,6 +102,41 @@ namespace margelo::nitro::ar {
     }
     inline void setAutoenablesDefaultLighting(std::optional<bool> autoenablesDefaultLighting) noexcept override {
       _swiftPart.setAutoenablesDefaultLighting(autoenablesDefaultLighting);
+    }
+    inline std::optional<SceneReconstructionMode> getSceneReconstruction() noexcept override {
+      auto __result = _swiftPart.getSceneReconstruction();
+      return __result;
+    }
+    inline void setSceneReconstruction(std::optional<SceneReconstructionMode> sceneReconstruction) noexcept override {
+      _swiftPart.setSceneReconstruction(sceneReconstruction);
+    }
+    inline std::optional<bool> getShowSceneMesh() noexcept override {
+      auto __result = _swiftPart.getShowSceneMesh();
+      return __result;
+    }
+    inline void setShowSceneMesh(std::optional<bool> showSceneMesh) noexcept override {
+      _swiftPart.setShowSceneMesh(showSceneMesh);
+    }
+    inline std::optional<bool> getSceneDepth() noexcept override {
+      auto __result = _swiftPart.getSceneDepth();
+      return __result;
+    }
+    inline void setSceneDepth(std::optional<bool> sceneDepth) noexcept override {
+      _swiftPart.setSceneDepth(sceneDepth);
+    }
+    inline std::optional<bool> getObjectOcclusion() noexcept override {
+      auto __result = _swiftPart.getObjectOcclusion();
+      return __result;
+    }
+    inline void setObjectOcclusion(std::optional<bool> objectOcclusion) noexcept override {
+      _swiftPart.setObjectOcclusion(objectOcclusion);
+    }
+    inline std::optional<bool> getPeopleOcclusion() noexcept override {
+      auto __result = _swiftPart.getPeopleOcclusion();
+      return __result;
+    }
+    inline void setPeopleOcclusion(std::optional<bool> peopleOcclusion) noexcept override {
+      _swiftPart.setPeopleOcclusion(peopleOcclusion);
     }
 
   public:
@@ -188,6 +226,14 @@ namespace margelo::nitro::ar {
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }
+    }
+    inline bool isLiDARAvailable() override {
+      auto __result = _swiftPart.isLiDARAvailable();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
     }
 
   private:

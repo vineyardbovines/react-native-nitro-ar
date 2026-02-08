@@ -15,6 +15,7 @@
 #include "HybridARFrameSpecSwift.hpp"
 #include "HybridARLightEstimateSpecSwift.hpp"
 #include "HybridARMeasurementSpecSwift.hpp"
+#include "HybridARMeshAnchorSpecSwift.hpp"
 #include "HybridARPlaneAnchorSpecSwift.hpp"
 #include "HybridARPlaneGeometrySpecSwift.hpp"
 #include "HybridARRaycastResultSpecSwift.hpp"
@@ -203,6 +204,22 @@ namespace margelo::nitro::ar::bridge::swift {
     return swiftPart.toUnsafe();
   }
   
+  // pragma MARK: std::shared_ptr<HybridARMeshAnchorSpec>
+  std::shared_ptr<HybridARMeshAnchorSpec> create_std__shared_ptr_HybridARMeshAnchorSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    NitroAR::HybridARMeshAnchorSpec_cxx swiftPart = NitroAR::HybridARMeshAnchorSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::ar::HybridARMeshAnchorSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridARMeshAnchorSpec_(std__shared_ptr_HybridARMeshAnchorSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::ar::HybridARMeshAnchorSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::ar::HybridARMeshAnchorSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridARMeshAnchorSpec\" is not implemented in Swift!");
+    }
+    #endif
+    NitroAR::HybridARMeshAnchorSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+  
   // pragma MARK: std::shared_ptr<HybridARWorldMapSpec>
   std::shared_ptr<HybridARWorldMapSpec> create_std__shared_ptr_HybridARWorldMapSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
     NitroAR::HybridARWorldMapSpec_cxx swiftPart = NitroAR::HybridARWorldMapSpec_cxx::fromUnsafe(swiftUnsafePointer);
@@ -271,6 +288,14 @@ namespace margelo::nitro::ar::bridge::swift {
   Func_void_std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__string_ create_Func_void_std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__string_(void* NON_NULL swiftClosureWrapper) noexcept {
     auto swiftClosure = NitroAR::Func_void_std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__string_::fromUnsafe(swiftClosureWrapper);
     return [swiftClosure = std::move(swiftClosure)](const std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>>& added, const std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>>& updated, const std::vector<std::string>& removed) mutable -> void {
+      swiftClosure.call(added, updated, removed);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>
+  Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_ create_Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = NitroAR::Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& added, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& updated, const std::vector<std::string>& removed) mutable -> void {
       swiftClosure.call(added, updated, removed);
     };
   }

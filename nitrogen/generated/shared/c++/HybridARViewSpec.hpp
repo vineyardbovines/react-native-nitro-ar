@@ -13,10 +13,13 @@
 #error NitroModules cannot be found! Are you sure you installed NitroModules properly?
 #endif
 
+// Forward declaration of `SceneReconstructionMode` to properly resolve imports.
+namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `ARViewHitResult` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARViewHitResult; }
 
 #include <optional>
+#include "SceneReconstructionMode.hpp"
 #include <string>
 #include "ARViewHitResult.hpp"
 
@@ -57,6 +60,16 @@ namespace margelo::nitro::ar {
       virtual void setShowWorldOrigin(std::optional<bool> showWorldOrigin) = 0;
       virtual std::optional<bool> getAutoenablesDefaultLighting() = 0;
       virtual void setAutoenablesDefaultLighting(std::optional<bool> autoenablesDefaultLighting) = 0;
+      virtual std::optional<SceneReconstructionMode> getSceneReconstruction() = 0;
+      virtual void setSceneReconstruction(std::optional<SceneReconstructionMode> sceneReconstruction) = 0;
+      virtual std::optional<bool> getShowSceneMesh() = 0;
+      virtual void setShowSceneMesh(std::optional<bool> showSceneMesh) = 0;
+      virtual std::optional<bool> getSceneDepth() = 0;
+      virtual void setSceneDepth(std::optional<bool> sceneDepth) = 0;
+      virtual std::optional<bool> getObjectOcclusion() = 0;
+      virtual void setObjectOcclusion(std::optional<bool> objectOcclusion) = 0;
+      virtual std::optional<bool> getPeopleOcclusion() = 0;
+      virtual void setPeopleOcclusion(std::optional<bool> peopleOcclusion) = 0;
 
     public:
       // Methods
@@ -74,6 +87,7 @@ namespace margelo::nitro::ar {
       virtual void startSession() = 0;
       virtual void pauseSession() = 0;
       virtual void resetSession() = 0;
+      virtual bool isLiDARAvailable() = 0;
 
     protected:
       // Hybrid Setup

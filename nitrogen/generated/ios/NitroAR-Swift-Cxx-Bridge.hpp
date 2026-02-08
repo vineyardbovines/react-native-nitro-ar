@@ -30,6 +30,8 @@ namespace margelo::nitro::ar { class HybridARFrameSpec; }
 namespace margelo::nitro::ar { class HybridARLightEstimateSpec; }
 // Forward declaration of `HybridARMeasurementSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARMeasurementSpec; }
+// Forward declaration of `HybridARMeshAnchorSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARMeshAnchorSpec; }
 // Forward declaration of `HybridARPlaneAnchorSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARPlaneAnchorSpec; }
 // Forward declaration of `HybridARPlaneGeometrySpec` to properly resolve imports.
@@ -44,8 +46,14 @@ namespace margelo::nitro::ar { class HybridARViewSpec; }
 namespace margelo::nitro::ar { class HybridARVolumeSpec; }
 // Forward declaration of `HybridARWorldMapSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
+// Forward declaration of `LiDARCapabilities` to properly resolve imports.
+namespace margelo::nitro::ar { struct LiDARCapabilities; }
+// Forward declaration of `MeshClassification` to properly resolve imports.
+namespace margelo::nitro::ar { enum class MeshClassification; }
 // Forward declaration of `PlaneDetectionMode` to properly resolve imports.
 namespace margelo::nitro::ar { enum class PlaneDetectionMode; }
+// Forward declaration of `SceneReconstructionMode` to properly resolve imports.
+namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `TrackingStateReason` to properly resolve imports.
 namespace margelo::nitro::ar { enum class TrackingStateReason; }
 // Forward declaration of `TrackingState` to properly resolve imports.
@@ -68,6 +76,8 @@ namespace NitroAR { class HybridARFrameSpec_cxx; }
 namespace NitroAR { class HybridARLightEstimateSpec_cxx; }
 // Forward declaration of `HybridARMeasurementSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARMeasurementSpec_cxx; }
+// Forward declaration of `HybridARMeshAnchorSpec_cxx` to properly resolve imports.
+namespace NitroAR { class HybridARMeshAnchorSpec_cxx; }
 // Forward declaration of `HybridARPlaneAnchorSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARPlaneAnchorSpec_cxx; }
 // Forward declaration of `HybridARPlaneGeometrySpec_cxx` to properly resolve imports.
@@ -95,6 +105,7 @@ namespace NitroAR { class HybridARWorldMapSpec_cxx; }
 #include "HybridARFrameSpec.hpp"
 #include "HybridARLightEstimateSpec.hpp"
 #include "HybridARMeasurementSpec.hpp"
+#include "HybridARMeshAnchorSpec.hpp"
 #include "HybridARPlaneAnchorSpec.hpp"
 #include "HybridARPlaneGeometrySpec.hpp"
 #include "HybridARRaycastResultSpec.hpp"
@@ -102,7 +113,10 @@ namespace NitroAR { class HybridARWorldMapSpec_cxx; }
 #include "HybridARViewSpec.hpp"
 #include "HybridARVolumeSpec.hpp"
 #include "HybridARWorldMapSpec.hpp"
+#include "LiDARCapabilities.hpp"
+#include "MeshClassification.hpp"
 #include "PlaneDetectionMode.hpp"
+#include "SceneReconstructionMode.hpp"
 #include "TrackingState.hpp"
 #include "TrackingStateReason.hpp"
 #include "WorldAlignment.hpp"
@@ -364,6 +378,29 @@ namespace margelo::nitro::ar::bridge::swift {
   using std__weak_ptr_HybridARRaycastResultSpec_ = std::weak_ptr<HybridARRaycastResultSpec>;
   inline std__weak_ptr_HybridARRaycastResultSpec_ weakify_std__shared_ptr_HybridARRaycastResultSpec_(const std::shared_ptr<HybridARRaycastResultSpec>& strong) noexcept { return strong; }
   
+  // pragma MARK: std::vector<MeshClassification>
+  /**
+   * Specialized version of `std::vector<MeshClassification>`.
+   */
+  using std__vector_MeshClassification_ = std::vector<MeshClassification>;
+  inline std::vector<MeshClassification> create_std__vector_MeshClassification_(size_t size) noexcept {
+    std::vector<MeshClassification> vector;
+    vector.reserve(size);
+    return vector;
+  }
+  
+  // pragma MARK: std::shared_ptr<HybridARMeshAnchorSpec>
+  /**
+   * Specialized version of `std::shared_ptr<HybridARMeshAnchorSpec>`.
+   */
+  using std__shared_ptr_HybridARMeshAnchorSpec_ = std::shared_ptr<HybridARMeshAnchorSpec>;
+  std::shared_ptr<HybridARMeshAnchorSpec> create_std__shared_ptr_HybridARMeshAnchorSpec_(void* NON_NULL swiftUnsafePointer) noexcept;
+  void* NON_NULL get_std__shared_ptr_HybridARMeshAnchorSpec_(std__shared_ptr_HybridARMeshAnchorSpec_ cppType);
+  
+  // pragma MARK: std::weak_ptr<HybridARMeshAnchorSpec>
+  using std__weak_ptr_HybridARMeshAnchorSpec_ = std::weak_ptr<HybridARMeshAnchorSpec>;
+  inline std__weak_ptr_HybridARMeshAnchorSpec_ weakify_std__shared_ptr_HybridARMeshAnchorSpec_(const std::shared_ptr<HybridARMeshAnchorSpec>& strong) noexcept { return strong; }
+  
   // pragma MARK: std::vector<PlaneDetectionMode>
   /**
    * Specialized version of `std::vector<PlaneDetectionMode>`.
@@ -432,6 +469,21 @@ namespace margelo::nitro::ar::bridge::swift {
     return optional.has_value();
   }
   inline WorldAlignment get_std__optional_WorldAlignment_(const std::optional<WorldAlignment>& optional) noexcept {
+    return *optional;
+  }
+  
+  // pragma MARK: std::optional<SceneReconstructionMode>
+  /**
+   * Specialized version of `std::optional<SceneReconstructionMode>`.
+   */
+  using std__optional_SceneReconstructionMode_ = std::optional<SceneReconstructionMode>;
+  inline std::optional<SceneReconstructionMode> create_std__optional_SceneReconstructionMode_(const SceneReconstructionMode& value) noexcept {
+    return std::optional<SceneReconstructionMode>(value);
+  }
+  inline bool has_value_std__optional_SceneReconstructionMode_(const std::optional<SceneReconstructionMode>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline SceneReconstructionMode get_std__optional_SceneReconstructionMode_(const std::optional<SceneReconstructionMode>& optional) noexcept {
     return *optional;
   }
   
@@ -717,6 +769,39 @@ namespace margelo::nitro::ar::bridge::swift {
     return Func_void_std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__shared_ptr_HybridARPlaneAnchorSpec___std__vector_std__string__Wrapper(std::move(value));
   }
   
+  // pragma MARK: std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>
+  /**
+   * Specialized version of `std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>`.
+   */
+  using std__vector_std__shared_ptr_HybridARMeshAnchorSpec__ = std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>;
+  inline std::vector<std::shared_ptr<HybridARMeshAnchorSpec>> create_std__vector_std__shared_ptr_HybridARMeshAnchorSpec__(size_t size) noexcept {
+    std::vector<std::shared_ptr<HybridARMeshAnchorSpec>> vector;
+    vector.reserve(size);
+    return vector;
+  }
+  
+  // pragma MARK: std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>
+  /**
+   * Specialized version of `std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>&, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>&, const std::vector<std::string>&)>`.
+   */
+  using Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_ = std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& / * added * /, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& / * updated * /, const std::vector<std::string>& / * removed * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string__Wrapper final {
+  public:
+    explicit Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string__Wrapper(std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>&& func): _function(std::make_unique<std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>>(std::move(func))) {}
+    inline void call(std::vector<std::shared_ptr<HybridARMeshAnchorSpec>> added, std::vector<std::shared_ptr<HybridARMeshAnchorSpec>> updated, std::vector<std::string> removed) const noexcept {
+      _function->operator()(added, updated, removed);
+    }
+  private:
+    std::unique_ptr<std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_ create_Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string__Wrapper wrap_Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_(Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_ value) noexcept {
+    return Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string__Wrapper(std::move(value));
+  }
+  
   // pragma MARK: std::shared_ptr<HybridARSessionSpec>
   /**
    * Specialized version of `std::shared_ptr<HybridARSessionSpec>`.
@@ -792,6 +877,15 @@ namespace margelo::nitro::ar::bridge::swift {
     return Result<std::function<void()>>::withError(error);
   }
   
+  // pragma MARK: Result<LiDARCapabilities>
+  using Result_LiDARCapabilities_ = Result<LiDARCapabilities>;
+  inline Result_LiDARCapabilities_ create_Result_LiDARCapabilities_(const LiDARCapabilities& value) noexcept {
+    return Result<LiDARCapabilities>::withValue(value);
+  }
+  inline Result_LiDARCapabilities_ create_Result_LiDARCapabilities_(const std::exception_ptr& error) noexcept {
+    return Result<LiDARCapabilities>::withError(error);
+  }
+  
   // pragma MARK: std::optional<ARViewHitResult>
   /**
    * Specialized version of `std::optional<ARViewHitResult>`.
@@ -826,6 +920,15 @@ namespace margelo::nitro::ar::bridge::swift {
   }
   inline Result_std__optional_ARViewHitResult__ create_Result_std__optional_ARViewHitResult__(const std::exception_ptr& error) noexcept {
     return Result<std::optional<ARViewHitResult>>::withError(error);
+  }
+  
+  // pragma MARK: Result<bool>
+  using Result_bool_ = Result<bool>;
+  inline Result_bool_ create_Result_bool_(bool value) noexcept {
+    return Result<bool>::withValue(std::move(value));
+  }
+  inline Result_bool_ create_Result_bool_(const std::exception_ptr& error) noexcept {
+    return Result<bool>::withError(error);
   }
 
 } // namespace margelo::nitro::ar::bridge::swift

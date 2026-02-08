@@ -24,6 +24,8 @@ namespace margelo::nitro::ar { class HybridARFrameSpec; }
 namespace margelo::nitro::ar { class HybridARAnchorSpec; }
 // Forward declaration of `HybridARPlaneAnchorSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARPlaneAnchorSpec; }
+// Forward declaration of `HybridARMeshAnchorSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARMeshAnchorSpec; }
 // Forward declaration of `ARSessionConfiguration` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARSessionConfiguration; }
 // Forward declaration of `PlaneDetectionMode` to properly resolve imports.
@@ -32,6 +34,8 @@ namespace margelo::nitro::ar { enum class PlaneDetectionMode; }
 namespace margelo::nitro::ar { enum class EnvironmentTexturing; }
 // Forward declaration of `WorldAlignment` to properly resolve imports.
 namespace margelo::nitro::ar { enum class WorldAlignment; }
+// Forward declaration of `SceneReconstructionMode` to properly resolve imports.
+namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `CameraPose` to properly resolve imports.
 namespace margelo::nitro::ar { struct CameraPose; }
 // Forward declaration of `HybridARRaycastResultSpec` to properly resolve imports.
@@ -46,6 +50,8 @@ namespace margelo::nitro::ar { enum class RaycastAlignment; }
 namespace margelo::nitro::ar { class HybridARMeasurementSpec; }
 // Forward declaration of `HybridARWorldMapSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
+// Forward declaration of `LiDARCapabilities` to properly resolve imports.
+namespace margelo::nitro::ar { struct LiDARCapabilities; }
 
 #include "TrackingState.hpp"
 #include "TrackingStateReason.hpp"
@@ -56,11 +62,13 @@ namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
 #include "HybridARAnchorSpec.hpp"
 #include <vector>
 #include "HybridARPlaneAnchorSpec.hpp"
+#include "HybridARMeshAnchorSpec.hpp"
 #include "ARSessionConfiguration.hpp"
 #include "PlaneDetectionMode.hpp"
 #include "EnvironmentTexturing.hpp"
 #include "WorldAlignment.hpp"
 #include <string>
+#include "SceneReconstructionMode.hpp"
 #include "CameraPose.hpp"
 #include "HybridARRaycastResultSpec.hpp"
 #include "RaycastQuery.hpp"
@@ -70,6 +78,7 @@ namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
 #include "HybridARWorldMapSpec.hpp"
 #include <NitroModules/Promise.hpp>
 #include <functional>
+#include "LiDARCapabilities.hpp"
 
 #include "NitroAR-Swift-Cxx-Umbrella.hpp"
 
@@ -142,6 +151,10 @@ namespace margelo::nitro::ar {
     }
     inline std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>> getPlaneAnchors() noexcept override {
       auto __result = _swiftPart.getPlaneAnchors();
+      return __result;
+    }
+    inline std::vector<std::shared_ptr<HybridARMeshAnchorSpec>> getMeshAnchors() noexcept override {
+      auto __result = _swiftPart.getMeshAnchors();
       return __result;
     }
 
@@ -253,6 +266,22 @@ namespace margelo::nitro::ar {
     }
     inline std::function<void()> onPlanesUpdated(const std::function<void(const std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>& callback) override {
       auto __result = _swiftPart.onPlanesUpdated(callback);
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline LiDARCapabilities getLiDARCapabilities() override {
+      auto __result = _swiftPart.getLiDARCapabilities();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::function<void()> onMeshUpdated(const std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>& callback) override {
+      auto __result = _swiftPart.onMeshUpdated(callback);
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

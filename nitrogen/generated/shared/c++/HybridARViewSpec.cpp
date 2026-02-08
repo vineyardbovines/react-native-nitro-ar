@@ -24,6 +24,16 @@ namespace margelo::nitro::ar {
       prototype.registerHybridSetter("showWorldOrigin", &HybridARViewSpec::setShowWorldOrigin);
       prototype.registerHybridGetter("autoenablesDefaultLighting", &HybridARViewSpec::getAutoenablesDefaultLighting);
       prototype.registerHybridSetter("autoenablesDefaultLighting", &HybridARViewSpec::setAutoenablesDefaultLighting);
+      prototype.registerHybridGetter("sceneReconstruction", &HybridARViewSpec::getSceneReconstruction);
+      prototype.registerHybridSetter("sceneReconstruction", &HybridARViewSpec::setSceneReconstruction);
+      prototype.registerHybridGetter("showSceneMesh", &HybridARViewSpec::getShowSceneMesh);
+      prototype.registerHybridSetter("showSceneMesh", &HybridARViewSpec::setShowSceneMesh);
+      prototype.registerHybridGetter("sceneDepth", &HybridARViewSpec::getSceneDepth);
+      prototype.registerHybridSetter("sceneDepth", &HybridARViewSpec::setSceneDepth);
+      prototype.registerHybridGetter("objectOcclusion", &HybridARViewSpec::getObjectOcclusion);
+      prototype.registerHybridSetter("objectOcclusion", &HybridARViewSpec::setObjectOcclusion);
+      prototype.registerHybridGetter("peopleOcclusion", &HybridARViewSpec::getPeopleOcclusion);
+      prototype.registerHybridSetter("peopleOcclusion", &HybridARViewSpec::setPeopleOcclusion);
       prototype.registerHybridMethod("addMeasurementPoint", &HybridARViewSpec::addMeasurementPoint);
       prototype.registerHybridMethod("removeMeasurementPoint", &HybridARViewSpec::removeMeasurementPoint);
       prototype.registerHybridMethod("updateMeasurementPoint", &HybridARViewSpec::updateMeasurementPoint);
@@ -38,6 +48,7 @@ namespace margelo::nitro::ar {
       prototype.registerHybridMethod("startSession", &HybridARViewSpec::startSession);
       prototype.registerHybridMethod("pauseSession", &HybridARViewSpec::pauseSession);
       prototype.registerHybridMethod("resetSession", &HybridARViewSpec::resetSession);
+      prototype.registerHybridMethod("isLiDARAvailable", &HybridARViewSpec::isLiDARAvailable);
     });
   }
 

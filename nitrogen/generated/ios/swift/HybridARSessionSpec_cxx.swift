@@ -196,6 +196,22 @@ open class HybridARSessionSpec_cxx {
       }()
     }
   }
+  
+  public final var meshAnchors: bridge.std__vector_std__shared_ptr_HybridARMeshAnchorSpec__ {
+    @inline(__always)
+    get {
+      return { () -> bridge.std__vector_std__shared_ptr_HybridARMeshAnchorSpec__ in
+        var __vector = bridge.create_std__vector_std__shared_ptr_HybridARMeshAnchorSpec__(self.__implementation.meshAnchors.count)
+        for __item in self.__implementation.meshAnchors {
+          __vector.push_back({ () -> bridge.std__shared_ptr_HybridARMeshAnchorSpec_ in
+            let __cxxWrapped = __item.getCxxWrapper()
+            return __cxxWrapped.getCxxPart()
+          }())
+        }
+        return __vector
+      }()
+    }
+  }
 
   // Methods
   @inline(__always)
@@ -492,6 +508,62 @@ open class HybridARSessionSpec_cxx {
             var __vector = bridge.create_std__vector_std__shared_ptr_HybridARPlaneAnchorSpec__(__updated.count)
             for __item in __updated {
               __vector.push_back({ () -> bridge.std__shared_ptr_HybridARPlaneAnchorSpec_ in
+                let __cxxWrapped = __item.getCxxWrapper()
+                return __cxxWrapped.getCxxPart()
+              }())
+            }
+            return __vector
+          }(), { () -> bridge.std__vector_std__string_ in
+            var __vector = bridge.create_std__vector_std__string_(__removed.count)
+            for __item in __removed {
+              __vector.push_back(std.string(__item))
+            }
+            return __vector
+          }())
+        }
+      }())
+      let __resultCpp = { () -> bridge.Func_void in
+        let __closureWrapper = Func_void(__result)
+        return bridge.create_Func_void(__closureWrapper.toUnsafe())
+      }()
+      return bridge.create_Result_std__function_void____(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__function_void____(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func getLiDARCapabilities() -> bridge.Result_LiDARCapabilities_ {
+    do {
+      let __result = try self.__implementation.getLiDARCapabilities()
+      let __resultCpp = __result
+      return bridge.create_Result_LiDARCapabilities_(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_LiDARCapabilities_(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func onMeshUpdated(callback: bridge.Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_) -> bridge.Result_std__function_void____ {
+    do {
+      let __result = try self.__implementation.onMeshUpdated(callback: { () -> ([(any HybridARMeshAnchorSpec)], [(any HybridARMeshAnchorSpec)], [String]) -> Void in
+        let __wrappedFunction = bridge.wrap_Func_void_std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__shared_ptr_HybridARMeshAnchorSpec___std__vector_std__string_(callback)
+        return { (__added: [(any HybridARMeshAnchorSpec)], __updated: [(any HybridARMeshAnchorSpec)], __removed: [String]) -> Void in
+          __wrappedFunction.call({ () -> bridge.std__vector_std__shared_ptr_HybridARMeshAnchorSpec__ in
+            var __vector = bridge.create_std__vector_std__shared_ptr_HybridARMeshAnchorSpec__(__added.count)
+            for __item in __added {
+              __vector.push_back({ () -> bridge.std__shared_ptr_HybridARMeshAnchorSpec_ in
+                let __cxxWrapped = __item.getCxxWrapper()
+                return __cxxWrapped.getCxxPart()
+              }())
+            }
+            return __vector
+          }(), { () -> bridge.std__vector_std__shared_ptr_HybridARMeshAnchorSpec__ in
+            var __vector = bridge.create_std__vector_std__shared_ptr_HybridARMeshAnchorSpec__(__updated.count)
+            for __item in __updated {
+              __vector.push_back({ () -> bridge.std__shared_ptr_HybridARMeshAnchorSpec_ in
                 let __cxxWrapped = __item.getCxxWrapper()
                 return __cxxWrapped.getCxxPart()
               }())

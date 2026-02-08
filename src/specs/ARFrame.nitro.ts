@@ -1,6 +1,6 @@
 import type { HybridObject } from "react-native-nitro-modules";
-import type { ARLightEstimate, ARDirectionalLightEstimate } from "./ARLightEstimate.nitro";
 import type { ARDepthData } from "./ARDepthData.nitro";
+import type { ARDirectionalLightEstimate, ARLightEstimate } from "./ARLightEstimate.nitro";
 
 export interface ARFrame extends HybridObject<{ ios: "swift" }> {
   /** Timestamp of this frame in seconds */

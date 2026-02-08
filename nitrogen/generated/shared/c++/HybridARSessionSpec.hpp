@@ -25,6 +25,8 @@ namespace margelo::nitro::ar { class HybridARFrameSpec; }
 namespace margelo::nitro::ar { class HybridARAnchorSpec; }
 // Forward declaration of `HybridARPlaneAnchorSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARPlaneAnchorSpec; }
+// Forward declaration of `HybridARMeshAnchorSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARMeshAnchorSpec; }
 // Forward declaration of `ARSessionConfiguration` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARSessionConfiguration; }
 // Forward declaration of `CameraPose` to properly resolve imports.
@@ -37,6 +39,8 @@ namespace margelo::nitro::ar { struct RaycastQuery; }
 namespace margelo::nitro::ar { class HybridARMeasurementSpec; }
 // Forward declaration of `HybridARWorldMapSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
+// Forward declaration of `LiDARCapabilities` to properly resolve imports.
+namespace margelo::nitro::ar { struct LiDARCapabilities; }
 
 #include "TrackingState.hpp"
 #include "TrackingStateReason.hpp"
@@ -47,6 +51,7 @@ namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
 #include "HybridARAnchorSpec.hpp"
 #include <vector>
 #include "HybridARPlaneAnchorSpec.hpp"
+#include "HybridARMeshAnchorSpec.hpp"
 #include "ARSessionConfiguration.hpp"
 #include "CameraPose.hpp"
 #include "HybridARRaycastResultSpec.hpp"
@@ -56,6 +61,7 @@ namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
 #include <NitroModules/Promise.hpp>
 #include <functional>
 #include <string>
+#include "LiDARCapabilities.hpp"
 
 namespace margelo::nitro::ar {
 
@@ -91,6 +97,7 @@ namespace margelo::nitro::ar {
       virtual std::optional<std::shared_ptr<HybridARFrameSpec>> getCurrentFrame() = 0;
       virtual std::vector<std::shared_ptr<HybridARAnchorSpec>> getAnchors() = 0;
       virtual std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>> getPlaneAnchors() = 0;
+      virtual std::vector<std::shared_ptr<HybridARMeshAnchorSpec>> getMeshAnchors() = 0;
 
     public:
       // Methods
@@ -109,6 +116,8 @@ namespace margelo::nitro::ar {
       virtual std::function<void()> onTrackingStateChanged(const std::function<void(TrackingState /* state */, TrackingStateReason /* reason */)>& callback) = 0;
       virtual std::function<void()> onAnchorsUpdated(const std::function<void(const std::vector<std::shared_ptr<HybridARAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>& callback) = 0;
       virtual std::function<void()> onPlanesUpdated(const std::function<void(const std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARPlaneAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>& callback) = 0;
+      virtual LiDARCapabilities getLiDARCapabilities() = 0;
+      virtual std::function<void()> onMeshUpdated(const std::function<void(const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* added */, const std::vector<std::shared_ptr<HybridARMeshAnchorSpec>>& /* updated */, const std::vector<std::string>& /* removed */)>& callback) = 0;
 
     protected:
       // Hybrid Setup

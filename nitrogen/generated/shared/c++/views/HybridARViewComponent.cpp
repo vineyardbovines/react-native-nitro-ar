@@ -76,6 +76,56 @@ namespace margelo::nitro::ar::views {
         throw std::runtime_error(std::string("ARView.autoenablesDefaultLighting: ") + exc.what());
       }
     }()),
+    sceneReconstruction([&]() -> CachedProp<std::optional<SceneReconstructionMode>> {
+      try {
+        const react::RawValue* rawValue = rawProps.at("sceneReconstruction", nullptr, nullptr);
+        if (rawValue == nullptr) return sourceProps.sceneReconstruction;
+        const auto& [runtime, value] = (std::pair<jsi::Runtime*, jsi::Value>)*rawValue;
+        return CachedProp<std::optional<SceneReconstructionMode>>::fromRawValue(*runtime, value, sourceProps.sceneReconstruction);
+      } catch (const std::exception& exc) {
+        throw std::runtime_error(std::string("ARView.sceneReconstruction: ") + exc.what());
+      }
+    }()),
+    showSceneMesh([&]() -> CachedProp<std::optional<bool>> {
+      try {
+        const react::RawValue* rawValue = rawProps.at("showSceneMesh", nullptr, nullptr);
+        if (rawValue == nullptr) return sourceProps.showSceneMesh;
+        const auto& [runtime, value] = (std::pair<jsi::Runtime*, jsi::Value>)*rawValue;
+        return CachedProp<std::optional<bool>>::fromRawValue(*runtime, value, sourceProps.showSceneMesh);
+      } catch (const std::exception& exc) {
+        throw std::runtime_error(std::string("ARView.showSceneMesh: ") + exc.what());
+      }
+    }()),
+    sceneDepth([&]() -> CachedProp<std::optional<bool>> {
+      try {
+        const react::RawValue* rawValue = rawProps.at("sceneDepth", nullptr, nullptr);
+        if (rawValue == nullptr) return sourceProps.sceneDepth;
+        const auto& [runtime, value] = (std::pair<jsi::Runtime*, jsi::Value>)*rawValue;
+        return CachedProp<std::optional<bool>>::fromRawValue(*runtime, value, sourceProps.sceneDepth);
+      } catch (const std::exception& exc) {
+        throw std::runtime_error(std::string("ARView.sceneDepth: ") + exc.what());
+      }
+    }()),
+    objectOcclusion([&]() -> CachedProp<std::optional<bool>> {
+      try {
+        const react::RawValue* rawValue = rawProps.at("objectOcclusion", nullptr, nullptr);
+        if (rawValue == nullptr) return sourceProps.objectOcclusion;
+        const auto& [runtime, value] = (std::pair<jsi::Runtime*, jsi::Value>)*rawValue;
+        return CachedProp<std::optional<bool>>::fromRawValue(*runtime, value, sourceProps.objectOcclusion);
+      } catch (const std::exception& exc) {
+        throw std::runtime_error(std::string("ARView.objectOcclusion: ") + exc.what());
+      }
+    }()),
+    peopleOcclusion([&]() -> CachedProp<std::optional<bool>> {
+      try {
+        const react::RawValue* rawValue = rawProps.at("peopleOcclusion", nullptr, nullptr);
+        if (rawValue == nullptr) return sourceProps.peopleOcclusion;
+        const auto& [runtime, value] = (std::pair<jsi::Runtime*, jsi::Value>)*rawValue;
+        return CachedProp<std::optional<bool>>::fromRawValue(*runtime, value, sourceProps.peopleOcclusion);
+      } catch (const std::exception& exc) {
+        throw std::runtime_error(std::string("ARView.peopleOcclusion: ") + exc.what());
+      }
+    }()),
     hybridRef([&]() -> CachedProp<std::optional<std::function<void(const std::shared_ptr<HybridARViewSpec>& /* ref */)>>> {
       try {
         const react::RawValue* rawValue = rawProps.at("hybridRef", nullptr, nullptr);
@@ -94,6 +144,11 @@ namespace margelo::nitro::ar::views {
       case hashString("showFeaturePoints"): return true;
       case hashString("showWorldOrigin"): return true;
       case hashString("autoenablesDefaultLighting"): return true;
+      case hashString("sceneReconstruction"): return true;
+      case hashString("showSceneMesh"): return true;
+      case hashString("sceneDepth"): return true;
+      case hashString("objectOcclusion"): return true;
+      case hashString("peopleOcclusion"): return true;
       case hashString("hybridRef"): return true;
       default: return false;
     }

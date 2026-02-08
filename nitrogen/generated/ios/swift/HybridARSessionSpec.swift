@@ -17,6 +17,7 @@ public protocol HybridARSessionSpec_protocol: HybridObject {
   var currentFrame: (any HybridARFrameSpec)? { get }
   var anchors: [(any HybridARAnchorSpec)] { get }
   var planeAnchors: [(any HybridARPlaneAnchorSpec)] { get }
+  var meshAnchors: [(any HybridARMeshAnchorSpec)] { get }
 
   // Methods
   func start(config: ARSessionConfiguration?) throws -> Void
@@ -34,6 +35,8 @@ public protocol HybridARSessionSpec_protocol: HybridObject {
   func onTrackingStateChanged(callback: @escaping (_ state: TrackingState, _ reason: TrackingStateReason) -> Void) throws -> () -> Void
   func onAnchorsUpdated(callback: @escaping (_ added: [(any HybridARAnchorSpec)], _ updated: [(any HybridARAnchorSpec)], _ removed: [String]) -> Void) throws -> () -> Void
   func onPlanesUpdated(callback: @escaping (_ added: [(any HybridARPlaneAnchorSpec)], _ updated: [(any HybridARPlaneAnchorSpec)], _ removed: [String]) -> Void) throws -> () -> Void
+  func getLiDARCapabilities() throws -> LiDARCapabilities
+  func onMeshUpdated(callback: @escaping (_ added: [(any HybridARMeshAnchorSpec)], _ updated: [(any HybridARMeshAnchorSpec)], _ removed: [String]) -> Void) throws -> () -> Void
 }
 
 public extension HybridARSessionSpec_protocol {

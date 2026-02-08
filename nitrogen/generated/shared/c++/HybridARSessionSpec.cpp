@@ -21,6 +21,7 @@ namespace margelo::nitro::ar {
       prototype.registerHybridGetter("currentFrame", &HybridARSessionSpec::getCurrentFrame);
       prototype.registerHybridGetter("anchors", &HybridARSessionSpec::getAnchors);
       prototype.registerHybridGetter("planeAnchors", &HybridARSessionSpec::getPlaneAnchors);
+      prototype.registerHybridGetter("meshAnchors", &HybridARSessionSpec::getMeshAnchors);
       prototype.registerHybridMethod("start", &HybridARSessionSpec::start);
       prototype.registerHybridMethod("pause", &HybridARSessionSpec::pause);
       prototype.registerHybridMethod("reset", &HybridARSessionSpec::reset);
@@ -36,6 +37,8 @@ namespace margelo::nitro::ar {
       prototype.registerHybridMethod("onTrackingStateChanged", &HybridARSessionSpec::onTrackingStateChanged);
       prototype.registerHybridMethod("onAnchorsUpdated", &HybridARSessionSpec::onAnchorsUpdated);
       prototype.registerHybridMethod("onPlanesUpdated", &HybridARSessionSpec::onPlanesUpdated);
+      prototype.registerHybridMethod("getLiDARCapabilities", &HybridARSessionSpec::getLiDARCapabilities);
+      prototype.registerHybridMethod("onMeshUpdated", &HybridARSessionSpec::onMeshUpdated);
     });
   }
 

@@ -1,15 +1,11 @@
 {
   "$schema": "https://nitro.margelo.com/nitro.schema.json",
-  "cxxNamespace": [
-    "ar"
-  ],
+  "cxxNamespace": ["ar"],
   "ios": {
     "iosModuleName": "NitroAR"
   },
   "android": {
-    "androidNamespace": [
-      "ar"
-    ],
+    "androidNamespace": ["ar"],
     "androidCxxLibName": "NitroAR"
   },
   "autolinking": {
@@ -23,7 +19,5 @@
       "swift": "HybridARView"
     }
   },
-  "ignorePaths": [
-    "**/node_modules"
-  ]
+  "ignorePaths": ["**/node_modules"]
 }

@@ -9,6 +9,11 @@
     "showFeaturePoints": true,
     "showWorldOrigin": true,
     "autoenablesDefaultLighting": true,
+    "sceneReconstruction": true,
+    "showSceneMesh": true,
+    "sceneDepth": true,
+    "objectOcclusion": true,
+    "peopleOcclusion": true,
     "hybridRef": true
   }
 }

@@ -17,6 +17,7 @@
 #include <react/renderer/components/view/ViewProps.h>
 
 #include <optional>
+#include "SceneReconstructionMode.hpp"
 #include <memory>
 #include "HybridARViewSpec.hpp"
 #include <functional>
@@ -46,6 +47,11 @@ namespace margelo::nitro::ar::views {
     CachedProp<std::optional<bool>> showFeaturePoints;
     CachedProp<std::optional<bool>> showWorldOrigin;
     CachedProp<std::optional<bool>> autoenablesDefaultLighting;
+    CachedProp<std::optional<SceneReconstructionMode>> sceneReconstruction;
+    CachedProp<std::optional<bool>> showSceneMesh;
+    CachedProp<std::optional<bool>> sceneDepth;
+    CachedProp<std::optional<bool>> objectOcclusion;
+    CachedProp<std::optional<bool>> peopleOcclusion;
     CachedProp<std::optional<std::function<void(const std::shared_ptr<HybridARViewSpec>& /* ref */)>>> hybridRef;
 
   private:

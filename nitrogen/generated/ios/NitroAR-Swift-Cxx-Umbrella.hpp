@@ -30,6 +30,8 @@ namespace margelo::nitro::ar { class HybridARFrameSpec; }
 namespace margelo::nitro::ar { class HybridARLightEstimateSpec; }
 // Forward declaration of `HybridARMeasurementSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARMeasurementSpec; }
+// Forward declaration of `HybridARMeshAnchorSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARMeshAnchorSpec; }
 // Forward declaration of `HybridARPlaneAnchorSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARPlaneAnchorSpec; }
 // Forward declaration of `HybridARPlaneGeometrySpec` to properly resolve imports.
@@ -44,6 +46,10 @@ namespace margelo::nitro::ar { class HybridARViewSpec; }
 namespace margelo::nitro::ar { class HybridARVolumeSpec; }
 // Forward declaration of `HybridARWorldMapSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARWorldMapSpec; }
+// Forward declaration of `LiDARCapabilities` to properly resolve imports.
+namespace margelo::nitro::ar { struct LiDARCapabilities; }
+// Forward declaration of `MeshClassification` to properly resolve imports.
+namespace margelo::nitro::ar { enum class MeshClassification; }
 // Forward declaration of `PlaneAlignment` to properly resolve imports.
 namespace margelo::nitro::ar { enum class PlaneAlignment; }
 // Forward declaration of `PlaneClassification` to properly resolve imports.
@@ -56,6 +62,8 @@ namespace margelo::nitro::ar { enum class RaycastAlignment; }
 namespace margelo::nitro::ar { struct RaycastQuery; }
 // Forward declaration of `RaycastTarget` to properly resolve imports.
 namespace margelo::nitro::ar { enum class RaycastTarget; }
+// Forward declaration of `SceneReconstructionMode` to properly resolve imports.
+namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `TrackingStateReason` to properly resolve imports.
 namespace margelo::nitro::ar { enum class TrackingStateReason; }
 // Forward declaration of `TrackingState` to properly resolve imports.
@@ -77,6 +85,7 @@ namespace margelo::nitro::ar { enum class WorldMappingStatus; }
 #include "HybridARFrameSpec.hpp"
 #include "HybridARLightEstimateSpec.hpp"
 #include "HybridARMeasurementSpec.hpp"
+#include "HybridARMeshAnchorSpec.hpp"
 #include "HybridARPlaneAnchorSpec.hpp"
 #include "HybridARPlaneGeometrySpec.hpp"
 #include "HybridARRaycastResultSpec.hpp"
@@ -84,12 +93,15 @@ namespace margelo::nitro::ar { enum class WorldMappingStatus; }
 #include "HybridARViewSpec.hpp"
 #include "HybridARVolumeSpec.hpp"
 #include "HybridARWorldMapSpec.hpp"
+#include "LiDARCapabilities.hpp"
+#include "MeshClassification.hpp"
 #include "PlaneAlignment.hpp"
 #include "PlaneClassification.hpp"
 #include "PlaneDetectionMode.hpp"
 #include "RaycastAlignment.hpp"
 #include "RaycastQuery.hpp"
 #include "RaycastTarget.hpp"
+#include "SceneReconstructionMode.hpp"
 #include "TrackingState.hpp"
 #include "TrackingStateReason.hpp"
 #include "WorldAlignment.hpp"
@@ -127,6 +139,8 @@ namespace NitroAR { class HybridARFrameSpec_cxx; }
 namespace NitroAR { class HybridARLightEstimateSpec_cxx; }
 // Forward declaration of `HybridARMeasurementSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARMeasurementSpec_cxx; }
+// Forward declaration of `HybridARMeshAnchorSpec_cxx` to properly resolve imports.
+namespace NitroAR { class HybridARMeshAnchorSpec_cxx; }
 // Forward declaration of `HybridARPlaneAnchorSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARPlaneAnchorSpec_cxx; }
 // Forward declaration of `HybridARPlaneGeometrySpec_cxx` to properly resolve imports.

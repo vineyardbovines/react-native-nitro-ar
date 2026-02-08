@@ -1,10 +1,6 @@
 import type { HybridObject } from "react-native-nitro-modules";
 
-export type WorldMappingStatus =
-  | "notAvailable"
-  | "limited"
-  | "extending"
-  | "mapped";
+export type WorldMappingStatus = "notAvailable" | "limited" | "extending" | "mapped";
 
 export interface ARWorldMap extends HybridObject<{ ios: "swift" }> {
   /** Unique identifier for this world map */

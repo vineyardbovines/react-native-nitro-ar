@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useRef, useState, useEffect } from "react";
-import { Platform, StyleSheet, Text, TouchableOpacity, View, Animated, Easing } from "react-native";
-import { callback } from "react-native-nitro-modules";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ARView, type ARViewMethods } from "react-native-nitro-ar";
+import { callback } from "react-native-nitro-modules";
 
 interface MeasurementPoint {
   id: string;

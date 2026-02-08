@@ -59,7 +59,7 @@ class HybridARView: HybridARViewSpec {
 
     // MARK: - LiDAR Properties
 
-    var sceneReconstruction: String? {
+    var sceneReconstruction: SceneReconstructionMode? {
         didSet {
             // Will be applied on next session start
         }
@@ -217,15 +217,17 @@ class HybridARView: HybridARViewSpec {
         if #available(iOS 13.4, *) {
             if let mode = sceneReconstruction {
                 switch mode {
-                case "mesh":
+                case .mesh:
                     if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
                         configuration.sceneReconstruction = .mesh
                     }
-                case "meshWithClassification":
+                case .meshwithclassification:
                     if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
                         configuration.sceneReconstruction = .meshWithClassification
                     }
-                default:
+                case .none:
+                    break
+                @unknown default:
                     break
                 }
             }
@@ -265,6 +267,44 @@ class HybridARView: HybridARViewSpec {
             configuration.environmentTexturing = .automatic
         }
 
+        // LiDAR: Scene Reconstruction
+        if #available(iOS 13.4, *) {
+            if let mode = sceneReconstruction {
+                switch mode {
+                case .mesh:
+                    if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
+                        configuration.sceneReconstruction = .mesh
+                    }
+                case .meshwithclassification:
+                    if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+                        configuration.sceneReconstruction = .meshWithClassification
+                    }
+                case .none:
+                    break
+                @unknown default:
+                    break
+                }
+            }
+        }
+
+        // LiDAR: Scene Depth
+        if #available(iOS 14.0, *) {
+            if sceneDepth == true {
+                if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
+                    configuration.frameSemantics.insert(.sceneDepth)
+                }
+            }
+        }
+
+        // People Occlusion
+        if #available(iOS 13.0, *) {
+            if peopleOcclusion == true {
+                if ARWorldTrackingConfiguration.supportsFrameSemantics(.personSegmentationWithDepth) {
+                    configuration.frameSemantics.insert(.personSegmentationWithDepth)
+                }
+            }
+        }
+
         arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
         try? clearAllVisuals()
     }
@@ -292,16 +332,23 @@ extension HybridARView {
 
 class NitroARSceneView: ARSCNView, ARSCNViewDelegate {
     var showPlaneOverlay: Bool = false
+    var showMeshOverlay: Bool = false
 
     // Callbacks for plane events
     var onPlaneAdded: ((ARPlaneAnchor, SCNNode) -> Void)?
     var onPlaneUpdated: ((ARPlaneAnchor, SCNNode) -> Void)?
     var onPlaneRemoved: ((ARPlaneAnchor) -> Void)?
 
+    // Callbacks for mesh events
+    var onMeshAdded: ((ARMeshAnchor, SCNNode) -> Void)?
+    var onMeshUpdated: ((ARMeshAnchor, SCNNode) -> Void)?
+    var onMeshRemoved: ((ARMeshAnchor) -> Void)?
+
     private var measurementNodes: [String: SCNNode] = [:]
     private var lineNodes: [String: SCNNode] = [:]
     private var labelNodes: [String: SCNNode] = [:]
     private var planeNodes: [UUID: SCNNode] = [:]
+    private var meshNodes: [UUID: SCNNode] = [:]
 
     override init(frame: CGRect, options: [String: Any]? = nil) {
         super.init(frame: frame, options: options)
@@ -322,18 +369,46 @@ class NitroARSceneView: ARSCNView, ARSCNViewDelegate {
     // MARK: - ARSCNViewDelegate
 
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
-        onPlaneAdded?(planeAnchor, node)
+        if let planeAnchor = anchor as? ARPlaneAnchor {
+            onPlaneAdded?(planeAnchor, node)
+        }
+
+        if #available(iOS 13.4, *) {
+            if let meshAnchor = anchor as? ARMeshAnchor {
+                if showMeshOverlay {
+                    addMeshVisualization(for: meshAnchor, node: node)
+                }
+                onMeshAdded?(meshAnchor, node)
+            }
+        }
     }
 
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
-        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
-        onPlaneUpdated?(planeAnchor, node)
+        if let planeAnchor = anchor as? ARPlaneAnchor {
+            onPlaneUpdated?(planeAnchor, node)
+        }
+
+        if #available(iOS 13.4, *) {
+            if let meshAnchor = anchor as? ARMeshAnchor {
+                if showMeshOverlay {
+                    updateMeshVisualization(for: meshAnchor, node: node)
+                }
+                onMeshUpdated?(meshAnchor, node)
+            }
+        }
     }
 
     func renderer(_ renderer: SCNSceneRenderer, didRemove node: SCNNode, for anchor: ARAnchor) {
-        guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
-        onPlaneRemoved?(planeAnchor)
+        if let planeAnchor = anchor as? ARPlaneAnchor {
+            onPlaneRemoved?(planeAnchor)
+        }
+
+        if #available(iOS 13.4, *) {
+            if let meshAnchor = anchor as? ARMeshAnchor {
+                meshNodes.removeValue(forKey: meshAnchor.identifier)
+                onMeshRemoved?(meshAnchor)
+            }
+        }
     }
 
     // MARK: - Measurement Points
@@ -516,6 +591,74 @@ class NitroARSceneView: ARSCNView, ARSCNViewDelegate {
     func removePlaneNode(for id: UUID) {
         planeNodes[id]?.removeFromParentNode()
         planeNodes.removeValue(forKey: id)
+    }
+
+    // MARK: - Mesh Visualization
+
+    @available(iOS 13.4, *)
+    private func addMeshVisualization(for meshAnchor: ARMeshAnchor, node: SCNNode) {
+        let geometry = createGeometry(from: meshAnchor)
+        let meshNode = SCNNode(geometry: geometry)
+        meshNode.name = "mesh_\(meshAnchor.identifier)"
+
+        node.addChildNode(meshNode)
+        meshNodes[meshAnchor.identifier] = meshNode
+    }
+
+    @available(iOS 13.4, *)
+    private func updateMeshVisualization(for meshAnchor: ARMeshAnchor, node: SCNNode) {
+        meshNodes[meshAnchor.identifier]?.removeFromParentNode()
+        addMeshVisualization(for: meshAnchor, node: node)
+    }
+
+    @available(iOS 13.4, *)
+    private func createGeometry(from meshAnchor: ARMeshAnchor) -> SCNGeometry {
+        let meshGeometry = meshAnchor.geometry
+
+        // Vertices
+        let vertexSource = SCNGeometrySource(
+            buffer: meshGeometry.vertices.buffer,
+            vertexFormat: meshGeometry.vertices.format,
+            semantic: .vertex,
+            vertexCount: meshGeometry.vertices.count,
+            dataOffset: meshGeometry.vertices.offset,
+            dataStride: meshGeometry.vertices.stride
+        )
+
+        // Normals
+        let normalSource = SCNGeometrySource(
+            buffer: meshGeometry.normals.buffer,
+            vertexFormat: meshGeometry.normals.format,
+            semantic: .normal,
+            vertexCount: meshGeometry.normals.count,
+            dataOffset: meshGeometry.normals.offset,
+            dataStride: meshGeometry.normals.stride
+        )
+
+        // Faces
+        let faceData = Data(
+            bytesNoCopy: meshGeometry.faces.buffer.contents(),
+            count: meshGeometry.faces.buffer.length,
+            deallocator: .none
+        )
+
+        let element = SCNGeometryElement(
+            data: faceData,
+            primitiveType: .triangles,
+            primitiveCount: meshGeometry.faces.count,
+            bytesPerIndex: MemoryLayout<UInt32>.size
+        )
+
+        let geometry = SCNGeometry(sources: [vertexSource, normalSource], elements: [element])
+
+        // Wireframe material for visualization
+        let material = SCNMaterial()
+        material.fillMode = .lines
+        material.diffuse.contents = UIColor.cyan.withAlphaComponent(0.6)
+        material.isDoubleSided = true
+        geometry.materials = [material]
+
+        return geometry
     }
 
     // MARK: - Clear All

@@ -15,6 +15,11 @@ public protocol HybridARViewSpec_protocol: HybridObject, HybridView {
   var showFeaturePoints: Bool? { get set }
   var showWorldOrigin: Bool? { get set }
   var autoenablesDefaultLighting: Bool? { get set }
+  var sceneReconstruction: SceneReconstructionMode? { get set }
+  var showSceneMesh: Bool? { get set }
+  var sceneDepth: Bool? { get set }
+  var objectOcclusion: Bool? { get set }
+  var peopleOcclusion: Bool? { get set }
 
   // Methods
   func addMeasurementPoint(id: String, x: Double, y: Double, z: Double, color: String?) throws -> Void
@@ -31,6 +36,7 @@ public protocol HybridARViewSpec_protocol: HybridObject, HybridView {
   func startSession() throws -> Void
   func pauseSession() throws -> Void
   func resetSession() throws -> Void
+  func isLiDARAvailable() throws -> Bool
 }
 
 public extension HybridARViewSpec_protocol {

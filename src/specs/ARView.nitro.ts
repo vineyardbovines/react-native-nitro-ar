@@ -1,8 +1,4 @@
-import type {
-  HybridView,
-  HybridViewMethods,
-  HybridViewProps,
-} from "react-native-nitro-modules";
+import type { HybridView, HybridViewMethods, HybridViewProps } from "react-native-nitro-modules";
 import type { SceneReconstructionMode } from "./ARSceneMesh.nitro";
 
 export interface ARViewHitResult {
@@ -38,13 +34,7 @@ export interface ARViewProps extends HybridViewProps {
 
 export interface ARViewMethods extends HybridViewMethods {
   // Measurement visualization
-  addMeasurementPoint(
-    id: string,
-    x: number,
-    y: number,
-    z: number,
-    color?: string
-  ): void;
+  addMeasurementPoint(id: string, x: number, y: number, z: number, color?: string): void;
   removeMeasurementPoint(id: string): void;
   updateMeasurementPoint(id: string, x: number, y: number, z: number): void;
 
@@ -71,20 +61,8 @@ export interface ARViewMethods extends HybridViewMethods {
   removeLine(id: string): void;
 
   // Label visualization
-  addDistanceLabel(
-    id: string,
-    x: number,
-    y: number,
-    z: number,
-    distance: number
-  ): void;
-  updateDistanceLabel(
-    id: string,
-    x: number,
-    y: number,
-    z: number,
-    distance: number
-  ): void;
+  addDistanceLabel(id: string, x: number, y: number, z: number, distance: number): void;
+  updateDistanceLabel(id: string, x: number, y: number, z: number, distance: number): void;
   removeDistanceLabel(id: string): void;
 
   // Clear all visuals
@@ -103,4 +81,4 @@ export interface ARViewMethods extends HybridViewMethods {
   isLiDARAvailable(): boolean;
 }
 
-export type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;
+type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;
