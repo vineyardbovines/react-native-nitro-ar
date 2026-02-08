@@ -1,0 +1,89 @@
+import type {
+  HybridView,
+  HybridViewMethods,
+  HybridViewProps,
+} from "react-native-nitro-modules";
+
+export interface ARViewHitResult {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface ARViewProps extends HybridViewProps {
+  /** Enable debug visualization (feature points, world origin) */
+  showDebugOptions?: boolean;
+  /** Enable plane detection visualization */
+  showPlanes?: boolean;
+  /** Enable feature point visualization */
+  showFeaturePoints?: boolean;
+  /** Enable world origin visualization */
+  showWorldOrigin?: boolean;
+  /** Enable automatic lighting */
+  autoenablesDefaultLighting?: boolean;
+}
+
+export interface ARViewMethods extends HybridViewMethods {
+  // Measurement visualization
+  addMeasurementPoint(
+    id: string,
+    x: number,
+    y: number,
+    z: number,
+    color?: string
+  ): void;
+  removeMeasurementPoint(id: string): void;
+  updateMeasurementPoint(id: string, x: number, y: number, z: number): void;
+
+  // Line visualization
+  addLine(
+    id: string,
+    fromX: number,
+    fromY: number,
+    fromZ: number,
+    toX: number,
+    toY: number,
+    toZ: number,
+    color?: string
+  ): void;
+  updateLine(
+    id: string,
+    fromX: number,
+    fromY: number,
+    fromZ: number,
+    toX: number,
+    toY: number,
+    toZ: number
+  ): void;
+  removeLine(id: string): void;
+
+  // Label visualization
+  addDistanceLabel(
+    id: string,
+    x: number,
+    y: number,
+    z: number,
+    distance: number
+  ): void;
+  updateDistanceLabel(
+    id: string,
+    x: number,
+    y: number,
+    z: number,
+    distance: number
+  ): void;
+  removeDistanceLabel(id: string): void;
+
+  // Clear all visuals
+  clearAllVisuals(): void;
+
+  // Raycast from screen point (normalized 0-1)
+  raycast(x: number, y: number): ARViewHitResult | undefined;
+
+  // Session control (the view manages its own session)
+  startSession(): void;
+  pauseSession(): void;
+  resetSession(): void;
+}
+
+export type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;

@@ -1,0 +1,14 @@
+{
+  "uiViewClassName": "ARView",
+  "supportsRawText": false,
+  "bubblingEventTypes": {},
+  "directEventTypes": {},
+  "validAttributes": {
+    "showDebugOptions": true,
+    "showPlanes": true,
+    "showFeaturePoints": true,
+    "showWorldOrigin": true,
+    "autoenablesDefaultLighting": true,
+    "hybridRef": true
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "name": "react-native-nitro-ar",
+  "description": "Nitro module for ARKit (iOS)",
+  "version": "2026.02.1",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
+  "expo": {
+    "pluginFile": "app.plugin.js"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "git clean -dfX",
+    "release": "semantic-release",
+    "build": "bun run typecheck && bob build",
+    "codegen": "nitrogen --logLevel=\"debug\" && bun run build"
+  },
+  "keywords": [
+    "react-native",
+    "react-native-nitro-ar",
+    "nitro",
+    "ar",
+    "arkit"
+  ],
+  "files": [
+    "src",
+    "react-native.config.js",
+    "lib",
+    "nitrogen",
+    "cpp",
+    "nitro.json",
+    "android/build.gradle",
+    "android/fix-prefab.gradle",
+    "android/gradle.properties",
+    "android/CMakeLists.txt",
+    "android/src",
+    "ios/**/*.h",
+    "ios/**/*.m",
+    "ios/**/*.mm",
+    "ios/**/*.cpp",
+    "ios/**/*.swift",
+    "app.plugin.js",
+    "*.podspec",
+    "README.md"
+  ],
+  "workspaces": [
+    "example"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vineyardbovines/react-native-nitro-ar.git"
+  },
+  "author": "Spencer Pope <spencer@thepope.dev>",
+  "license": "MIT",
+  "bugs": "https://github.com/vineyardbovines/react-native-nitro-ar/issues",
+  "homepage": "https://github.com/vineyardbovines/react-native-nitro-ar#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.13",
+    "@commitlint/config-conventional": "^20.4.1",
+    "@types/react": "^19.2.13",
+    "commitlint": "^20.4.1",
+    "knip": "^5.83.0",
+    "lefthook": "^2.0.16",
+    "nitrogen": "^0.33.7",
+    "react-native-builder-bob": "^0.40.17",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "^9.0.0"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-nitro-modules": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "bun@1.2.22",
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      [
+        "typescript",
+        {
+          "project": "tsconfig.json"
+        }
+      ]
+    ]
+  }
+}
