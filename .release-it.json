@@ -6,12 +6,12 @@
     "tag": true,
     "tagName": "${version}",
     "push": false,
-    "changelog": "npx auto-changelog --stdout --template https://raw.githubusercontent.com/vineyardbovines/calver/refs/heads/main/template/changelog-compact-latest.hbs"
+    "changelog": "bunx auto-changelog --stdout --template https://raw.githubusercontent.com/vineyardbovines/calver/refs/heads/main/template/changelog-compact-latest.hbs"
   },
   "github": {
     "release": true,
     "releaseName": "${version}",
-    "changelog": "npx auto-changelog --stdout --template https://raw.githubusercontent.com/vineyardbovines/calver/refs/heads/main/template/changelog-compact-latest.hbs"
+    "changelog": "bunx auto-changelog --stdout --template https://raw.githubusercontent.com/vineyardbovines/calver/refs/heads/main/template/changelog-compact-latest.hbs"
   },
   "npm": {
     "publish": true,
@@ -19,7 +19,7 @@
   },
   "hooks": {
     "after:bump": [
-      "npx auto-changelog --package --template https://raw.githubusercontent.com/vineyardbovines/calver/refs/heads/main/template/changelog-full.hbs",
+      "bunx auto-changelog --package --template https://raw.githubusercontent.com/vineyardbovines/calver/refs/heads/main/template/changelog-full.hbs",
       "git add CHANGELOG.md package.json"
     ]
   },
