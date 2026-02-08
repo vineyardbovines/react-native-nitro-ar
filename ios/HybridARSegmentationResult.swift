@@ -95,12 +95,17 @@ final class HybridARSegmentationResult: HybridARSegmentationResultSpec {
 
     func getDepthPoints() throws -> [Double] {
         if let cached = cachedDepthPoints {
+            print("[GetDepthPoints] Returning cached \(cached.count / 3) points")
             return cached
         }
 
         guard let sceneDepth = frame.sceneDepth else {
+            print("[GetDepthPoints] No sceneDepth available (LiDAR required)")
             return []
         }
+
+        print("[GetDepthPoints] Scene depth available, extracting points...")
+        print("[GetDepthPoints] Camera image: \(CVPixelBufferGetWidth(frame.capturedImage))x\(CVPixelBufferGetHeight(frame.capturedImage))")
 
         guard let maskBuffer = try? mask.generateScaledMaskForImage(
             forInstances: IndexSet(integer: selectedIndex),
@@ -122,6 +127,8 @@ final class HybridARSegmentationResult: HybridARSegmentationResultSpec {
         let maskWidth = CVPixelBufferGetWidth(maskBuffer)
         let maskHeight = CVPixelBufferGetHeight(maskBuffer)
 
+        print("[GetDepthPoints] Depth buffer: \(depthWidth)x\(depthHeight), Mask: \(maskWidth)x\(maskHeight)")
+
         guard let depthBase = CVPixelBufferGetBaseAddress(depthMap),
               let maskBase = CVPixelBufferGetBaseAddress(maskBuffer) else {
             return []
@@ -132,6 +139,11 @@ final class HybridARSegmentationResult: HybridARSegmentationResultSpec {
         let depthBuffer = depthBase.assumingMemoryBound(to: Float32.self)
         let maskBufferPtr = maskBase.assumingMemoryBound(to: UInt8.self)
 
+        // Get camera image dimensions for coordinate scaling
+        let imageWidth = CVPixelBufferGetWidth(frame.capturedImage)
+        let imageHeight = CVPixelBufferGetHeight(frame.capturedImage)
+
+        // Intrinsics are in camera image coordinate space
         let intrinsics = frame.camera.intrinsics
         let fx = intrinsics[0][0]
         let fy = intrinsics[1][1]
@@ -160,9 +172,13 @@ final class HybridARSegmentationResult: HybridARSegmentationResultSpec {
 
                 guard depth > 0, depth < 10 else { continue } // Valid depth range
 
-                // Convert to 3D point in camera space
-                let x = Double((Float(depthX) - cx) * depth / fx)
-                let y = Double((Float(depthY) - cy) * depth / fy)
+                // Scale depth coordinates to camera image space for use with intrinsics
+                let imageX = Float(depthX) * Float(imageWidth) / Float(depthWidth)
+                let imageY = Float(depthY) * Float(imageHeight) / Float(depthHeight)
+
+                // Convert to 3D point in camera space using properly scaled coordinates
+                let x = Double((imageX - cx) * depth / fx)
+                let y = Double((imageY - cy) * depth / fy)
                 let z = Double(depth)
 
                 // Transform to world space
@@ -173,6 +189,22 @@ final class HybridARSegmentationResult: HybridARSegmentationResultSpec {
                 points.append(Double(worldPoint.y))
                 points.append(Double(worldPoint.z))
             }
+        }
+
+        print("[GetDepthPoints] Extracted \(points.count / 3) 3D points from depth data")
+
+        // Log point cloud bounds for debugging
+        if points.count >= 3 {
+            var minX = Double.greatestFiniteMagnitude, maxX = -Double.greatestFiniteMagnitude
+            var minY = Double.greatestFiniteMagnitude, maxY = -Double.greatestFiniteMagnitude
+            var minZ = Double.greatestFiniteMagnitude, maxZ = -Double.greatestFiniteMagnitude
+            for i in stride(from: 0, to: points.count, by: 3) {
+                minX = min(minX, points[i]); maxX = max(maxX, points[i])
+                minY = min(minY, points[i+1]); maxY = max(maxY, points[i+1])
+                minZ = min(minZ, points[i+2]); maxZ = max(maxZ, points[i+2])
+            }
+            print("[GetDepthPoints] Point cloud bounds: X[\(minX)...\(maxX)], Y[\(minY)...\(maxY)], Z[\(minZ)...\(maxZ)]")
+            print("[GetDepthPoints] Extents: X=\(maxX-minX)m, Y=\(maxY-minY)m, Z=\(maxZ-minZ)m")
         }
 
         cachedDepthPoints = points

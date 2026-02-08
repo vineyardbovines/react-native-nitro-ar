@@ -202,72 +202,60 @@ class HybridARView: HybridARViewSpec {
 
     func segmentObject(x: Double, y: Double) throws -> Promise<(any HybridARSegmentationResultSpec)?> {
         return Promise.async { [weak self] in
-            guard let self = self else { return nil }
+            guard let self = self else {
+                print("[SegmentObject] self is nil")
+                return nil
+            }
 
             guard #available(iOS 17.0, *) else {
+                print("[SegmentObject] iOS 17+ required")
                 return nil
             }
 
             guard let frame = self.arView.session.currentFrame else {
+                print("[SegmentObject] No current frame")
                 return nil
             }
 
-            // Convert normalized coordinates to pixel coordinates
-            let imageSize = CGSize(
-                width: CVPixelBufferGetWidth(frame.capturedImage),
-                height: CVPixelBufferGetHeight(frame.capturedImage)
-            )
-            let point = CGPoint(x: x * imageSize.width, y: y * imageSize.height)
+            let imageWidth = CGFloat(CVPixelBufferGetWidth(frame.capturedImage))
+            let imageHeight = CGFloat(CVPixelBufferGetHeight(frame.capturedImage))
+
+            print("[SegmentObject] Screen normalized: (\(x), \(y))")
+            print("[SegmentObject] Image size: \(imageWidth) x \(imageHeight)")
 
             // Perform instance segmentation
             let request = VNGenerateForegroundInstanceMaskRequest()
             let handler = VNImageRequestHandler(cvPixelBuffer: frame.capturedImage, orientation: .right)
 
-            try handler.perform([request])
+            do {
+                try handler.perform([request])
+            } catch {
+                print("[SegmentObject] Vision request failed: \(error)")
+                return nil
+            }
 
             guard let observation = request.results?.first else {
+                print("[SegmentObject] No segmentation results")
                 return nil
             }
 
             // Find which instance contains the tapped point
             let instances = observation.allInstances
-            var selectedIndex: Int?
+            print("[SegmentObject] Found \(instances.count) instances")
 
-            for index in instances {
-                if let maskBuffer = try? observation.generateScaledMaskForImage(
-                    forInstances: IndexSet(integer: index),
-                    from: handler
-                ) {
-                    CVPixelBufferLockBaseAddress(maskBuffer, .readOnly)
-                    defer { CVPixelBufferUnlockBaseAddress(maskBuffer, .readOnly) }
-
-                    let maskWidth = CVPixelBufferGetWidth(maskBuffer)
-                    let maskHeight = CVPixelBufferGetHeight(maskBuffer)
-                    let bytesPerRow = CVPixelBufferGetBytesPerRow(maskBuffer)
-
-                    guard let baseAddress = CVPixelBufferGetBaseAddress(maskBuffer) else { continue }
-
-                    let buffer = baseAddress.assumingMemoryBound(to: UInt8.self)
-                    let maskX = Int(point.x * CGFloat(maskWidth) / imageSize.width)
-                    let maskY = Int(point.y * CGFloat(maskHeight) / imageSize.height)
-
-                    if maskX >= 0, maskX < maskWidth, maskY >= 0, maskY < maskHeight {
-                        let pixelValue = buffer[maskY * bytesPerRow + maskX]
-                        if pixelValue > 127 {
-                            selectedIndex = index
-                            break
-                        }
-                    }
-                }
-            }
-
-            guard let index = selectedIndex else {
+            if instances.isEmpty {
+                print("[SegmentObject] No foreground instances detected in scene")
                 return nil
             }
 
+            // For now, just use the first (usually largest/most prominent) instance
+            // TODO: Improve tap-to-instance mapping
+            let selectedIndex = instances.first!
+
+            print("[SegmentObject] Selected instance \(selectedIndex)")
             return HybridARSegmentationResult(
                 mask: observation,
-                selectedIndex: index,
+                selectedIndex: selectedIndex,
                 frame: frame,
                 sceneView: self.arView
             )
@@ -276,21 +264,47 @@ class HybridARView: HybridARViewSpec {
 
     func measureObject(x: Double, y: Double) throws -> Promise<ARObjectMeasurement?> {
         return Promise.async { [weak self] in
-            guard let self = self else { return nil }
+            guard let self = self else {
+                print("[MeasureObject] self is nil")
+                throw NSError(domain: "ARView", code: 1, userInfo: [NSLocalizedDescriptionKey: "View not available"])
+            }
 
             guard #available(iOS 17.0, *) else {
-                return nil
+                print("[MeasureObject] iOS 17+ required")
+                throw NSError(domain: "ARView", code: 2, userInfo: [NSLocalizedDescriptionKey: "iOS 17+ required for object measurement"])
             }
+
+            guard self.arView.session.currentFrame != nil else {
+                print("[MeasureObject] No current frame")
+                throw NSError(domain: "ARView", code: 3, userInfo: [NSLocalizedDescriptionKey: "No AR frame available"])
+            }
+
+            guard self.arView.session.currentFrame?.sceneDepth != nil else {
+                print("[MeasureObject] No scene depth - LiDAR required")
+                throw NSError(domain: "ARView", code: 4, userInfo: [NSLocalizedDescriptionKey: "LiDAR depth data not available. Is sceneDepth enabled?"])
+            }
+
+            print("[MeasureObject] Starting measurement at (\(x), \(y))")
 
             // First segment the object
             let segmentationResult = try await self.segmentObject(x: x, y: y).await()
 
             guard let segmentation = segmentationResult as? HybridARSegmentationResult else {
-                return nil
+                print("[MeasureObject] Segmentation failed or no object found")
+                throw NSError(domain: "ARView", code: 5, userInfo: [NSLocalizedDescriptionKey: "No foreground object detected. Try pointing at a distinct object."])
             }
 
+            print("[MeasureObject] Segmentation successful, measuring...")
+
             // Then measure it
-            return try segmentation.measure()
+            let measurement = try segmentation.measure()
+            if let m = measurement {
+                print("[MeasureObject] Measurement: W=\(m.width), H=\(m.height), D=\(m.depth), confidence=\(m.confidence)")
+            } else {
+                print("[MeasureObject] Measurement returned nil (not enough depth points?)")
+                throw NSError(domain: "ARView", code: 6, userInfo: [NSLocalizedDescriptionKey: "Not enough depth points for measurement. Move closer to the object."])
+            }
+            return measurement
         }
     }
 

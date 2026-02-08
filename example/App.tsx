@@ -4,6 +4,7 @@ import {
   Animated,
   Easing,
   type GestureResponderEvent,
+  type LayoutChangeEvent,
   Platform,
   StyleSheet,
   Text,
@@ -13,7 +14,15 @@ import {
 import { type ARObjectMeasurement, ARView, type ARViewMethods } from "react-native-nitro-ar";
 import { callback } from "react-native-nitro-modules";
 
-type MeasureMode = "line" | "object";
+type MeasureMode = "line" | "box" | "object";
+
+type BoxDimension = "width" | "height" | "depth";
+
+interface BoxMeasurement {
+  width: number | null;
+  height: number | null;
+  depth: number | null;
+}
 
 interface MeasurementPoint {
   id: string;
@@ -79,6 +88,34 @@ const calculateDistanceRaw = (
   return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2 + (p2.z - p1.z) ** 2);
 };
 
+const getDimensionLabel = (dim: BoxDimension): string => {
+  switch (dim) {
+    case "width":
+      return "Width";
+    case "height":
+      return "Height";
+    case "depth":
+      return "Depth";
+  }
+};
+
+const getNextDimension = (current: BoxDimension): BoxDimension | null => {
+  switch (current) {
+    case "width":
+      return "height";
+    case "height":
+      return "depth";
+    case "depth":
+      return null;
+  }
+};
+
+const boxDimensionColors: Record<BoxDimension, string> = {
+  width: "#FF6B6B",
+  height: "#4ECDC4",
+  depth: "#45B7D1",
+};
+
 export default function App() {
   const arViewRef = useRef<ARViewMethods | null>(null);
   const [isRunning, setIsRunning] = useState(false);
@@ -101,6 +138,17 @@ export default function App() {
   const [measureMode, setMeasureMode] = useState<MeasureMode>("line");
   const [objectMeasurement, setObjectMeasurement] = useState<ARObjectMeasurement | null>(null);
   const [isMeasuringObject, setIsMeasuringObject] = useState(false);
+  const [viewLayout, setViewLayout] = useState({ width: 0, height: 0 });
+  const [objectMeasureStatus, setObjectMeasureStatus] = useState<string | null>(null);
+
+  // Box measurement mode
+  const [boxMeasurement, setBoxMeasurement] = useState<BoxMeasurement>({
+    width: null,
+    height: null,
+    depth: null,
+  });
+  const [currentBoxDimension, setCurrentBoxDimension] = useState<BoxDimension>("width");
+  const [boxPoints, setBoxPoints] = useState<MeasurementPoint[]>([]);
 
   // Animation for the reticle
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -136,47 +184,65 @@ export default function App() {
       setHasSurface(!!hit);
       setCurrentHitPoint(hit ?? null);
 
-      // Calculate live distance and show preview line if we have one point placed
-      if (hit && points.length === 1) {
+      // Calculate live distance for line mode
+      if (measureMode === "line" && hit && points.length === 1) {
         const distance = calculateDistanceRaw(points[0], hit);
         setLiveDistance(distance);
-
-        // Update the live preview line (addLine handles updates automatically)
         const p1 = points[0];
         arView.addLine(liveLineId, p1.x, p1.y, p1.z, hit.x, hit.y, hit.z, "#FFFFFF");
+      }
+      // Calculate live distance for box mode
+      else if (measureMode === "box" && hit && boxPoints.length === 1) {
+        const distance = calculateDistanceRaw(boxPoints[0], hit);
+        setLiveDistance(distance);
+        const p1 = boxPoints[0];
+        arView.addLine(
+          liveLineId,
+          p1.x,
+          p1.y,
+          p1.z,
+          hit.x,
+          hit.y,
+          hit.z,
+          boxDimensionColors[currentBoxDimension]
+        );
       } else {
         setLiveDistance(null);
         // Remove preview line when not measuring
-        if (points.length !== 1) {
+        if (points.length !== 1 && boxPoints.length !== 1) {
           arView.removeLine(liveLineId);
         }
       }
-    }, 50); // Faster updates for smoother live measurement
+    }, 50);
 
     return () => {
       clearInterval(interval);
-      // Clean up preview line on unmount
       const arView = arViewRef.current;
       if (arView) {
         arView.removeLine(liveLineId);
       }
     };
-  }, [isRunning, points]);
+  }, [isRunning, points, boxPoints, measureMode, currentBoxDimension]);
 
   const startSession = useCallback(() => {
     const arView = arViewRef.current;
     if (!arView) return;
 
     try {
-      // Check for LiDAR support
+      // Check for LiDAR support BEFORE starting session
       const lidarAvailable = arView.isLiDARAvailable();
       setHasLiDAR(lidarAvailable);
       if (lidarAvailable) {
-        console.log("LiDAR detected - enabling scene reconstruction");
+        console.log("LiDAR detected - enabling scene reconstruction and depth");
       }
 
-      arView.startSession();
-      setIsRunning(true);
+      // Start the session - but we need to wait for the sceneDepth prop to update
+      // Use a small delay to ensure React has updated the props
+      setTimeout(() => {
+        console.log("Starting AR session with LiDAR:", lidarAvailable);
+        arView.startSession();
+        setIsRunning(true);
+      }, 100);
     } catch (e) {
       console.error("Error starting session:", e);
     }
@@ -276,7 +342,161 @@ export default function App() {
 
   const closeMeasurementCard = useCallback(() => {
     setShowMeasurementCard(false);
+    setObjectMeasurement(null);
   }, []);
+
+  // Box measurement functions
+  const addBoxPointAtCenter = useCallback(() => {
+    const arView = arViewRef.current;
+    if (!arView || !isRunning) return;
+
+    try {
+      const hit = arView.raycast(0.5, 0.5);
+
+      if (hit) {
+        const pointId = `box_point_${Date.now()}`;
+        const newPoint: MeasurementPoint = {
+          id: pointId,
+          x: hit.x,
+          y: hit.y,
+          z: hit.z,
+        };
+
+        // Add measurement point visualization with dimension-specific color
+        arView.addMeasurementPoint(
+          pointId,
+          hit.x,
+          hit.y,
+          hit.z,
+          boxDimensionColors[currentBoxDimension]
+        );
+
+        const newBoxPoints = [...boxPoints, newPoint];
+        setBoxPoints(newBoxPoints);
+
+        // If we have 2 points, complete this dimension
+        if (newBoxPoints.length === 2) {
+          const p1 = newBoxPoints[0];
+          const p2 = newBoxPoints[1];
+          const distance = calculateDistance(p1, p2);
+
+          // Remove the preview line
+          arView.removeLine("live_preview_line");
+
+          // Draw the measurement line
+          const lineId = `box_line_${currentBoxDimension}`;
+          arView.addLine(
+            lineId,
+            p1.x,
+            p1.y,
+            p1.z,
+            p2.x,
+            p2.y,
+            p2.z,
+            boxDimensionColors[currentBoxDimension]
+          );
+
+          // Update box measurement
+          setBoxMeasurement((prev) => ({
+            ...prev,
+            [currentBoxDimension]: distance,
+          }));
+
+          // Move to next dimension or show results
+          const nextDim = getNextDimension(currentBoxDimension);
+          if (nextDim) {
+            setCurrentBoxDimension(nextDim);
+            setBoxPoints([]);
+          } else {
+            // All dimensions measured - show results
+            setShowMeasurementCard(true);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error adding box point:", e);
+    }
+  }, [isRunning, boxPoints, currentBoxDimension]);
+
+  const clearBoxMeasurement = useCallback(() => {
+    const arView = arViewRef.current;
+    if (!arView) return;
+
+    arView.clearAllVisuals();
+    setBoxMeasurement({ width: null, height: null, depth: null });
+    setCurrentBoxDimension("width");
+    setBoxPoints([]);
+    setShowMeasurementCard(false);
+  }, []);
+
+  const undoBoxPoint = useCallback(() => {
+    const arView = arViewRef.current;
+    if (!arView) return;
+
+    if (boxPoints.length > 0) {
+      // Remove last point
+      const lastPoint = boxPoints[boxPoints.length - 1];
+      arView.removeMeasurementPoint(lastPoint.id);
+      setBoxPoints(boxPoints.slice(0, -1));
+    } else if (currentBoxDimension !== "width") {
+      // Go back to previous dimension
+      const prevDim: BoxDimension = currentBoxDimension === "depth" ? "height" : "width";
+      arView.removeLine(`box_line_${prevDim}`);
+      setBoxMeasurement((prev) => ({ ...prev, [prevDim]: null }));
+      setCurrentBoxDimension(prevDim);
+    }
+  }, [boxPoints, currentBoxDimension]);
+
+  // Handle layout changes to get accurate view dimensions
+  const handleLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setViewLayout({ width, height });
+  }, []);
+
+  // Handle tap for object measurement
+  const handleObjectMeasure = useCallback(
+    async (event: GestureResponderEvent) => {
+      const arView = arViewRef.current;
+      if (!arView || !isRunning || measureMode !== "object" || isMeasuringObject) return;
+
+      // Get normalized coordinates from touch
+      const { locationX, locationY } = event.nativeEvent;
+
+      // Use tracked view dimensions, fallback to reasonable defaults
+      const viewWidth = viewLayout.width > 0 ? viewLayout.width : 390;
+      const viewHeight = viewLayout.height > 0 ? viewLayout.height : 844;
+      const normalizedX = locationX / viewWidth;
+      const normalizedY = locationY / viewHeight;
+
+      console.log(
+        `[ObjectMeasure] Tap at (${locationX.toFixed(0)}, ${locationY.toFixed(0)}) -> normalized (${normalizedX.toFixed(3)}, ${normalizedY.toFixed(3)})`
+      );
+      console.log(`[ObjectMeasure] View dimensions: ${viewWidth} x ${viewHeight}`);
+
+      setIsMeasuringObject(true);
+      setObjectMeasureStatus("Analyzing...");
+      try {
+        console.log("[ObjectMeasure] Calling measureObject...");
+        const result = await arView.measureObject(normalizedX, normalizedY);
+        console.log("[ObjectMeasure] Result:", result);
+        if (result) {
+          setObjectMeasurement(result);
+          setShowMeasurementCard(true);
+          setObjectMeasureStatus(null);
+        } else {
+          setObjectMeasureStatus("No object detected. Try tapping directly on an object.");
+          setTimeout(() => setObjectMeasureStatus(null), 3000);
+        }
+      } catch (e) {
+        console.error("[ObjectMeasure] Error:", e);
+        setObjectMeasureStatus(`Error: ${e}`);
+        setTimeout(() => setObjectMeasureStatus(null), 3000);
+      } finally {
+        setIsMeasuringObject(false);
+      }
+    },
+    [isRunning, measureMode, isMeasuringObject, viewLayout]
+  );
 
   if (Platform.OS !== "ios") {
     return (
@@ -313,6 +533,8 @@ export default function App() {
         hybridRef={callback((ref) => {
           arViewRef.current = ref;
         })}
+        onLayout={handleLayout}
+        onTouchEnd={measureMode === "object" ? handleObjectMeasure : undefined}
       />
 
       {/* Top toolbar */}
@@ -326,8 +548,8 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      {/* Center reticle */}
-      {isRunning && !showMeasurementCard && (
+      {/* Center reticle (line and box modes) */}
+      {isRunning && !showMeasurementCard && (measureMode === "line" || measureMode === "box") && (
         <View style={styles.reticleContainer}>
           {/* Outer rotating circle */}
           <Animated.View
@@ -357,6 +579,77 @@ export default function App() {
         </View>
       )}
 
+      {/* Box mode instruction */}
+      {isRunning && !showMeasurementCard && measureMode === "box" && (
+        <View style={styles.boxModeContainer}>
+          {/* Progress indicator */}
+          <View style={styles.boxProgressRow}>
+            <View
+              style={[
+                styles.boxProgressItem,
+                boxMeasurement.width !== null && styles.boxProgressItemComplete,
+                currentBoxDimension === "width" && styles.boxProgressItemActive,
+              ]}
+            >
+              <View
+                style={[styles.boxProgressDot, { backgroundColor: boxDimensionColors.width }]}
+              />
+              <Text style={styles.boxProgressText}>W</Text>
+            </View>
+            <View style={styles.boxProgressConnector} />
+            <View
+              style={[
+                styles.boxProgressItem,
+                boxMeasurement.height !== null && styles.boxProgressItemComplete,
+                currentBoxDimension === "height" && styles.boxProgressItemActive,
+              ]}
+            >
+              <View
+                style={[styles.boxProgressDot, { backgroundColor: boxDimensionColors.height }]}
+              />
+              <Text style={styles.boxProgressText}>H</Text>
+            </View>
+            <View style={styles.boxProgressConnector} />
+            <View
+              style={[
+                styles.boxProgressItem,
+                boxMeasurement.depth !== null && styles.boxProgressItemComplete,
+                currentBoxDimension === "depth" && styles.boxProgressItemActive,
+              ]}
+            >
+              <View
+                style={[styles.boxProgressDot, { backgroundColor: boxDimensionColors.depth }]}
+              />
+              <Text style={styles.boxProgressText}>D</Text>
+            </View>
+          </View>
+
+          {/* Current instruction */}
+          <View style={styles.boxModeInstruction}>
+            <View
+              style={[
+                styles.dimensionIndicator,
+                { backgroundColor: boxDimensionColors[currentBoxDimension] },
+              ]}
+            />
+            <Text style={styles.boxModeText}>
+              Measure {getDimensionLabel(currentBoxDimension)}
+              {boxPoints.length === 1 ? " - Place second point" : " - Place first point"}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {/* Object mode instruction */}
+      {isRunning && !showMeasurementCard && measureMode === "object" && (
+        <View style={styles.objectModeInstruction}>
+          <Text style={styles.objectModeText}>
+            {objectMeasureStatus ??
+              (isMeasuringObject ? "Analyzing..." : "Tap on an object to measure")}
+          </Text>
+        </View>
+      )}
+
       {/* Start button when not running */}
       {!isRunning && (
         <View style={styles.startContainer}>
@@ -366,10 +659,9 @@ export default function App() {
         </View>
       )}
 
-      {/* Bottom controls */}
-      {isRunning && !showMeasurementCard && (
+      {/* Bottom controls (line mode) */}
+      {isRunning && !showMeasurementCard && measureMode === "line" && (
         <View style={styles.bottomControls}>
-          {/* Undo button */}
           <TouchableOpacity
             style={[styles.controlButton, points.length === 0 && styles.controlButtonDisabled]}
             onPress={undoLastPoint}
@@ -378,7 +670,6 @@ export default function App() {
             <Text style={styles.undoIcon}>↩</Text>
           </TouchableOpacity>
 
-          {/* Add point button */}
           <TouchableOpacity
             style={[styles.addButton, !hasSurface && styles.addButtonDisabled]}
             onPress={addPointAtCenter}
@@ -387,30 +678,84 @@ export default function App() {
             <Text style={styles.addButtonIcon}>+</Text>
           </TouchableOpacity>
 
-          {/* Screenshot button placeholder */}
           <TouchableOpacity style={styles.controlButton}>
             <View style={styles.screenshotIcon} />
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Mode selector (Measure/Level) */}
+      {/* Bottom controls (box mode) */}
+      {isRunning && !showMeasurementCard && measureMode === "box" && (
+        <View style={styles.bottomControls}>
+          <TouchableOpacity
+            style={[
+              styles.controlButton,
+              boxPoints.length === 0 &&
+                currentBoxDimension === "width" &&
+                styles.controlButtonDisabled,
+            ]}
+            onPress={undoBoxPoint}
+            disabled={boxPoints.length === 0 && currentBoxDimension === "width"}
+          >
+            <Text style={styles.undoIcon}>↩</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.addButton, !hasSurface && styles.addButtonDisabled]}
+            onPress={addBoxPointAtCenter}
+            disabled={!hasSurface}
+          >
+            <Text style={styles.addButtonIcon}>+</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.controlButton} onPress={clearBoxMeasurement}>
+            <Text style={styles.undoIcon}>🗑</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Mode selector (Line/Box/Object) */}
       {isRunning && (
         <View style={styles.modeSelector}>
           <View style={styles.modeSelectorInner}>
-            <TouchableOpacity style={[styles.modeButton, styles.modeButtonActive]}>
+            <TouchableOpacity
+              style={[styles.modeButton, measureMode === "line" && styles.modeButtonActive]}
+              onPress={() => setMeasureMode("line")}
+            >
               <Text style={styles.modeIcon}>📏</Text>
-              <Text style={styles.modeText}>Measure</Text>
+              <Text style={measureMode === "line" ? styles.modeText : styles.modeTextInactive}>
+                Line
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modeButton}>
-              <Text style={styles.modeIcon}>⚖️</Text>
-              <Text style={styles.modeTextInactive}>Level</Text>
+            <TouchableOpacity
+              style={[styles.modeButton, measureMode === "box" && styles.modeButtonActive]}
+              onPress={() => setMeasureMode("box")}
+            >
+              <Text style={styles.modeIcon}>📦</Text>
+              <Text style={measureMode === "box" ? styles.modeText : styles.modeTextInactive}>
+                Box
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeButton, measureMode === "object" && styles.modeButtonActive]}
+              onPress={() => setMeasureMode("object")}
+              disabled={!hasLiDAR}
+            >
+              <Text style={[styles.modeIcon, !hasLiDAR && styles.modeIconDisabled]}>🔍</Text>
+              <Text
+                style={[
+                  measureMode === "object" ? styles.modeText : styles.modeTextInactive,
+                  !hasLiDAR && styles.modeTextDisabled,
+                ]}
+              >
+                Auto
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
-      {/* Measurement card overlay */}
+      {/* Line Measurement card overlay */}
       {showMeasurementCard && currentMeasurement && distanceDisplay && distanceAwayDisplay && (
         <View style={styles.measurementCard}>
           <View style={styles.cardHandle} />
@@ -462,6 +807,161 @@ export default function App() {
           {/* New measurement button */}
           <TouchableOpacity style={styles.newMeasurementButton} onPress={clearMeasurements}>
             <Text style={styles.newMeasurementText}>New Measurement</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Box Measurement card overlay */}
+      {showMeasurementCard &&
+        measureMode === "box" &&
+        boxMeasurement.width !== null &&
+        boxMeasurement.height !== null &&
+        boxMeasurement.depth !== null && (
+          <View style={styles.measurementCard}>
+            <View style={styles.cardHandle} />
+
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Box Dimensions</Text>
+              <TouchableOpacity style={styles.closeButton} onPress={clearBoxMeasurement}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Visual box representation */}
+            <View style={styles.boxVisual}>
+              <Text style={styles.boxIcon}>📦</Text>
+            </View>
+
+            {/* Dimensions grid */}
+            <View style={styles.dimensionsGrid}>
+              <View
+                style={[
+                  styles.dimensionItem,
+                  { borderLeftColor: boxDimensionColors.width, borderLeftWidth: 3 },
+                ]}
+              >
+                <Text style={styles.dimensionLabel}>Width</Text>
+                <Text style={styles.dimensionValue}>
+                  {formatDistance(boxMeasurement.width).imperial}
+                </Text>
+                <Text style={styles.dimensionMetric}>
+                  {formatDistance(boxMeasurement.width).metric}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.dimensionItem,
+                  { borderLeftColor: boxDimensionColors.height, borderLeftWidth: 3 },
+                ]}
+              >
+                <Text style={styles.dimensionLabel}>Height</Text>
+                <Text style={styles.dimensionValue}>
+                  {formatDistance(boxMeasurement.height).imperial}
+                </Text>
+                <Text style={styles.dimensionMetric}>
+                  {formatDistance(boxMeasurement.height).metric}
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.dimensionItem,
+                  { borderLeftColor: boxDimensionColors.depth, borderLeftWidth: 3 },
+                ]}
+              >
+                <Text style={styles.dimensionLabel}>Depth</Text>
+                <Text style={styles.dimensionValue}>
+                  {formatDistance(boxMeasurement.depth).imperial}
+                </Text>
+                <Text style={styles.dimensionMetric}>
+                  {formatDistance(boxMeasurement.depth).metric}
+                </Text>
+              </View>
+            </View>
+
+            {/* Copy button */}
+            <TouchableOpacity style={styles.copyButton}>
+              <Text style={styles.copyButtonText}>Copy All</Text>
+            </TouchableOpacity>
+
+            {/* New measurement button */}
+            <TouchableOpacity style={styles.newMeasurementButton} onPress={clearBoxMeasurement}>
+              <Text style={styles.newMeasurementText}>New Box Measurement</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+      {/* Object Measurement card overlay (Auto mode) */}
+      {showMeasurementCard && objectMeasurement && (
+        <View style={styles.measurementCard}>
+          <View style={styles.cardHandle} />
+
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Object Dimensions</Text>
+            <TouchableOpacity style={styles.closeButton} onPress={closeMeasurementCard}>
+              <Text style={styles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Visual box representation */}
+          <View style={styles.boxVisual}>
+            <Text style={styles.boxIcon}>📦</Text>
+          </View>
+
+          {/* Dimensions grid */}
+          <View style={styles.dimensionsGrid}>
+            <View style={styles.dimensionItem}>
+              <Text style={styles.dimensionLabel}>Width</Text>
+              <Text style={styles.dimensionValue}>
+                {formatDistance(objectMeasurement.width).imperial}
+              </Text>
+              <Text style={styles.dimensionMetric}>
+                {formatDistance(objectMeasurement.width).metric}
+              </Text>
+            </View>
+            <View style={styles.dimensionItem}>
+              <Text style={styles.dimensionLabel}>Height</Text>
+              <Text style={styles.dimensionValue}>
+                {formatDistance(objectMeasurement.height).imperial}
+              </Text>
+              <Text style={styles.dimensionMetric}>
+                {formatDistance(objectMeasurement.height).metric}
+              </Text>
+            </View>
+            <View style={styles.dimensionItem}>
+              <Text style={styles.dimensionLabel}>Depth</Text>
+              <Text style={styles.dimensionValue}>
+                {formatDistance(objectMeasurement.depth).imperial}
+              </Text>
+              <Text style={styles.dimensionMetric}>
+                {formatDistance(objectMeasurement.depth).metric}
+              </Text>
+            </View>
+          </View>
+
+          {/* Confidence indicator */}
+          <View style={styles.confidenceRow}>
+            <Text style={styles.confidenceLabel}>Confidence</Text>
+            <Text style={styles.confidenceValue}>
+              {Math.round(objectMeasurement.confidence * 100)}%
+            </Text>
+          </View>
+
+          {/* Point count info */}
+          <View style={styles.infoRow}>
+            <Text style={styles.infoText}>
+              Based on {Math.round(objectMeasurement.pointCount)} depth points
+            </Text>
+          </View>
+
+          {/* New measurement button */}
+          <TouchableOpacity
+            style={styles.newMeasurementButton}
+            onPress={() => {
+              setObjectMeasurement(null);
+              setShowMeasurementCard(false);
+            }}
+          >
+            <Text style={styles.newMeasurementText}>Measure Another Object</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -650,6 +1150,94 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
   },
+  modeIconDisabled: {
+    opacity: 0.4,
+  },
+  modeTextDisabled: {
+    opacity: 0.4,
+  },
+  boxModeContainer: {
+    position: "absolute",
+    top: 110,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  boxProgressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 10,
+  },
+  boxProgressItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    opacity: 0.5,
+  },
+  boxProgressItemComplete: {
+    opacity: 1,
+  },
+  boxProgressItemActive: {
+    opacity: 1,
+  },
+  boxProgressDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 4,
+  },
+  boxProgressText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  boxProgressConnector: {
+    width: 20,
+    height: 2,
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    marginHorizontal: 8,
+  },
+  boxModeInstruction: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dimensionIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  boxModeText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  objectModeInstruction: {
+    position: "absolute",
+    top: "45%",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  objectModeText: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "500",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    overflow: "hidden",
+  },
   // Measurement card
   measurementCard: {
     position: "absolute",
@@ -776,6 +1364,67 @@ const styles = StyleSheet.create({
     color: "#007AFF",
     fontSize: 17,
     fontWeight: "500",
+  },
+  // Object measurement styles
+  boxVisual: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  boxIcon: {
+    fontSize: 48,
+  },
+  dimensionsGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  dimensionItem: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 12,
+    backgroundColor: "rgba(60, 60, 60, 0.6)",
+    marginHorizontal: 4,
+    borderRadius: 12,
+  },
+  dimensionLabel: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.6)",
+    marginBottom: 4,
+  },
+  dimensionValue: {
+    fontSize: 24,
+    fontWeight: "500",
+    color: "#FFFFFF",
+  },
+  dimensionMetric: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.5)",
+    marginTop: 2,
+  },
+  confidenceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(255, 255, 255, 0.2)",
+  },
+  confidenceLabel: {
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.6)",
+  },
+  confidenceValue: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#FFFFFF",
+  },
+  infoRow: {
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  infoText: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.4)",
   },
   title: {
     fontSize: 28,
