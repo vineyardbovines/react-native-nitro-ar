@@ -1,7 +1,7 @@
 {
   "name": "react-native-nitro-ar",
   "description": "Nitro module for ARKit (iOS)",
-  "version": "2026.02.1",
+  "version": "2026.2.1",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
