@@ -82,6 +82,10 @@ export default function App() {
     z: number;
   } | null>(null);
 
+  // LiDAR state
+  const [hasLiDAR, setHasLiDAR] = useState(false);
+  const [showMesh, setShowMesh] = useState(false);
+
   // Animation for the reticle
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
