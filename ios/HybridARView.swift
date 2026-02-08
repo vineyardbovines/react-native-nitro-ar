@@ -57,6 +57,48 @@ class HybridARView: HybridARViewSpec {
         }
     }
 
+    // MARK: - LiDAR Properties
+
+    var sceneReconstruction: String? {
+        didSet {
+            // Will be applied on next session start
+        }
+    }
+
+    var showSceneMesh: Bool? {
+        didSet {
+            arView.showMeshOverlay = showSceneMesh ?? false
+        }
+    }
+
+    var sceneDepth: Bool? {
+        didSet {
+            // Will be applied on next session start
+        }
+    }
+
+    var objectOcclusion: Bool? {
+        didSet {
+            updateOcclusionSettings()
+        }
+    }
+
+    var peopleOcclusion: Bool? {
+        didSet {
+            updateOcclusionSettings()
+        }
+    }
+
+    private func updateOcclusionSettings() {
+        #if !targetEnvironment(simulator)
+        if #available(iOS 13.0, *) {
+            if peopleOcclusion == true {
+                arView.environment.sceneUnderstanding.options.insert(.occlusion)
+            }
+        }
+        #endif
+    }
+
     private func updateDebugOptions() {
         // Debug visualization options
         // Note: showFeaturePoints and showWorldOrigin are available in ARSCNDebugOptions
@@ -151,6 +193,15 @@ class HybridARView: HybridARViewSpec {
         )
     }
 
+    // MARK: - LiDAR
+
+    func isLiDARAvailable() throws -> Bool {
+        if #available(iOS 13.4, *) {
+            return ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
+        }
+        return false
+    }
+
     // MARK: - Session Control
 
     func startSession() throws {
@@ -160,6 +211,42 @@ class HybridARView: HybridARViewSpec {
 
         if #available(iOS 16.0, *) {
             configuration.environmentTexturing = .automatic
+        }
+
+        // LiDAR: Scene Reconstruction
+        if #available(iOS 13.4, *) {
+            if let mode = sceneReconstruction {
+                switch mode {
+                case "mesh":
+                    if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh) {
+                        configuration.sceneReconstruction = .mesh
+                    }
+                case "meshWithClassification":
+                    if ARWorldTrackingConfiguration.supportsSceneReconstruction(.meshWithClassification) {
+                        configuration.sceneReconstruction = .meshWithClassification
+                    }
+                default:
+                    break
+                }
+            }
+        }
+
+        // LiDAR: Scene Depth
+        if #available(iOS 14.0, *) {
+            if sceneDepth == true {
+                if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
+                    configuration.frameSemantics.insert(.sceneDepth)
+                }
+            }
+        }
+
+        // People Occlusion
+        if #available(iOS 13.0, *) {
+            if peopleOcclusion == true {
+                if ARWorldTrackingConfiguration.supportsFrameSemantics(.personSegmentationWithDepth) {
+                    configuration.frameSemantics.insert(.personSegmentationWithDepth)
+                }
+            }
         }
 
         arView.session.run(configuration)

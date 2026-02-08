@@ -46,6 +46,12 @@ export interface ARSessionConfiguration {
   worldAlignment?: WorldAlignment;
   /** Initial world map data (base64) for relocalization */
   initialWorldMap?: string;
+  /** Enable scene reconstruction/mesh (requires LiDAR) */
+  sceneReconstruction?: SceneReconstructionMode;
+  /** Enable people occlusion */
+  peopleOcclusion?: boolean;
+  /** Enable object occlusion (requires LiDAR scene reconstruction) */
+  objectOcclusion?: boolean;
 }
 
 export interface ARSession extends HybridObject<{ ios: "swift" }> {
@@ -100,6 +106,22 @@ export interface ARSession extends HybridObject<{ ios: "swift" }> {
     callback: (
       added: ARPlaneAnchor[],
       updated: ARPlaneAnchor[],
+      removed: string[]
+    ) => void
+  ): () => void;
+
+  // LiDAR / Scene Mesh
+  /** Check LiDAR capabilities on this device */
+  getLiDARCapabilities(): LiDARCapabilities;
+
+  /** Get current mesh anchors (requires sceneReconstruction enabled) */
+  readonly meshAnchors: ARMeshAnchor[];
+
+  /** Callback when mesh anchors are updated */
+  onMeshUpdated(
+    callback: (
+      added: ARMeshAnchor[],
+      updated: ARMeshAnchor[],
       removed: string[]
     ) => void
   ): () => void;

@@ -3,6 +3,7 @@ import type {
   HybridViewMethods,
   HybridViewProps,
 } from "react-native-nitro-modules";
+import type { SceneReconstructionMode } from "./ARSceneMesh.nitro";
 
 export interface ARViewHitResult {
   x: number;
@@ -21,6 +22,18 @@ export interface ARViewProps extends HybridViewProps {
   showWorldOrigin?: boolean;
   /** Enable automatic lighting */
   autoenablesDefaultLighting?: boolean;
+
+  // LiDAR Features
+  /** Enable scene mesh reconstruction (requires LiDAR) */
+  sceneReconstruction?: SceneReconstructionMode;
+  /** Show the scene mesh wireframe for debugging */
+  showSceneMesh?: boolean;
+  /** Enable scene depth (requires LiDAR) */
+  sceneDepth?: boolean;
+  /** Enable object occlusion using scene mesh */
+  objectOcclusion?: boolean;
+  /** Enable people occlusion */
+  peopleOcclusion?: boolean;
 }
 
 export interface ARViewMethods extends HybridViewMethods {
@@ -84,6 +97,10 @@ export interface ARViewMethods extends HybridViewMethods {
   startSession(): void;
   pauseSession(): void;
   resetSession(): void;
+
+  // LiDAR
+  /** Check if LiDAR is available on this device */
+  isLiDARAvailable(): boolean;
 }
 
 export type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;

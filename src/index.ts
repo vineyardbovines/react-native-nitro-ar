@@ -47,6 +47,13 @@ export type { ARDepthData } from "./specs/ARDepthData.nitro";
 
 export type { ARFrame } from "./specs/ARFrame.nitro";
 
+export type {
+  ARMeshAnchor,
+  MeshClassification,
+  SceneReconstructionMode,
+  LiDARCapabilities,
+} from "./specs/ARSceneMesh.nitro";
+
 export type { ARWorldMap, WorldMappingStatus } from "./specs/ARWorldMap.nitro";
 
 export type { ARViewProps, ARViewMethods, ARViewHitResult } from "./specs/ARView.nitro";
