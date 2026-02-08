@@ -16,11 +16,20 @@ namespace NitroAR { class HybridARViewSpec_cxx; }
 namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `ARViewHitResult` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARViewHitResult; }
+// Forward declaration of `HybridARSegmentationResultSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARSegmentationResultSpec; }
+// Forward declaration of `ARObjectMeasurement` to properly resolve imports.
+namespace margelo::nitro::ar { struct ARObjectMeasurement; }
 
 #include <optional>
 #include "SceneReconstructionMode.hpp"
 #include <string>
 #include "ARViewHitResult.hpp"
+#include <memory>
+#include "HybridARSegmentationResultSpec.hpp"
+#include <NitroModules/Promise.hpp>
+#include "ARObjectMeasurement.hpp"
+#include <vector>
 
 #include "NitroAR-Swift-Cxx-Umbrella.hpp"
 
@@ -229,6 +238,22 @@ namespace margelo::nitro::ar {
     }
     inline bool isLiDARAvailable() override {
       auto __result = _swiftPart.isLiDARAvailable();
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>> segmentObject(double x, double y) override {
+      auto __result = _swiftPart.segmentObject(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
+      if (__result.hasError()) [[unlikely]] {
+        std::rethrow_exception(__result.error());
+      }
+      auto __value = std::move(__result.value());
+      return __value;
+    }
+    inline std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>> measureObject(double x, double y) override {
+      auto __result = _swiftPart.measureObject(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y));
       if (__result.hasError()) [[unlikely]] {
         std::rethrow_exception(__result.error());
       }

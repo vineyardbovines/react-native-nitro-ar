@@ -1,8 +1,19 @@
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ARView, type ARViewMethods } from "react-native-nitro-ar";
+import {
+  Animated,
+  Easing,
+  type GestureResponderEvent,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { type ARObjectMeasurement, ARView, type ARViewMethods } from "react-native-nitro-ar";
 import { callback } from "react-native-nitro-modules";
+
+type MeasureMode = "line" | "object";
 
 interface MeasurementPoint {
   id: string;
@@ -85,6 +96,11 @@ export default function App() {
   // LiDAR state
   const [hasLiDAR, setHasLiDAR] = useState(false);
   const [showMesh, setShowMesh] = useState(false);
+
+  // Measurement mode
+  const [measureMode, setMeasureMode] = useState<MeasureMode>("line");
+  const [objectMeasurement, setObjectMeasurement] = useState<ARObjectMeasurement | null>(null);
+  const [isMeasuringObject, setIsMeasuringObject] = useState(false);
 
   // Animation for the reticle
   const rotateAnim = useRef(new Animated.Value(0)).current;

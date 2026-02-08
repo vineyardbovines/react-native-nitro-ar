@@ -13,6 +13,10 @@ export type {
   ARLightEstimate,
 } from "./specs/ARLightEstimate.nitro";
 export type { ARMeasurement } from "./specs/ARMeasurement.nitro";
+export type {
+  ARObjectMeasurement,
+  ARSegmentationResult,
+} from "./specs/ARObjectMeasurement.nitro";
 
 export type {
   ARPlaneAnchor,

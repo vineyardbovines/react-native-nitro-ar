@@ -19,6 +19,7 @@
 #include "HybridARPlaneAnchorSpecSwift.hpp"
 #include "HybridARPlaneGeometrySpecSwift.hpp"
 #include "HybridARRaycastResultSpecSwift.hpp"
+#include "HybridARSegmentationResultSpecSwift.hpp"
 #include "HybridARSessionSpecSwift.hpp"
 #include "HybridARViewSpecSwift.hpp"
 #include "HybridARVolumeSpecSwift.hpp"
@@ -153,6 +154,22 @@ namespace margelo::nitro::ar::bridge::swift {
     }
     #endif
     NitroAR::HybridARMeasurementSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
+    return swiftPart.toUnsafe();
+  }
+  
+  // pragma MARK: std::shared_ptr<HybridARSegmentationResultSpec>
+  std::shared_ptr<HybridARSegmentationResultSpec> create_std__shared_ptr_HybridARSegmentationResultSpec_(void* NON_NULL swiftUnsafePointer) noexcept {
+    NitroAR::HybridARSegmentationResultSpec_cxx swiftPart = NitroAR::HybridARSegmentationResultSpec_cxx::fromUnsafe(swiftUnsafePointer);
+    return std::make_shared<margelo::nitro::ar::HybridARSegmentationResultSpecSwift>(swiftPart);
+  }
+  void* NON_NULL get_std__shared_ptr_HybridARSegmentationResultSpec_(std__shared_ptr_HybridARSegmentationResultSpec_ cppType) {
+    std::shared_ptr<margelo::nitro::ar::HybridARSegmentationResultSpecSwift> swiftWrapper = std::dynamic_pointer_cast<margelo::nitro::ar::HybridARSegmentationResultSpecSwift>(cppType);
+    #ifdef NITRO_DEBUG
+    if (swiftWrapper == nullptr) [[unlikely]] {
+      throw std::runtime_error("Class \"HybridARSegmentationResultSpec\" is not implemented in Swift!");
+    }
+    #endif
+    NitroAR::HybridARSegmentationResultSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
   }
   
@@ -314,6 +331,22 @@ namespace margelo::nitro::ar::bridge::swift {
     #endif
     NitroAR::HybridARSessionSpec_cxx& swiftPart = swiftWrapper->getSwiftPart();
     return swiftPart.toUnsafe();
+  }
+  
+  // pragma MARK: std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& /* result */)>
+  Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__ create_Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = NitroAR::Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& result) mutable -> void {
+      swiftClosure.call(result);
+    };
+  }
+  
+  // pragma MARK: std::function<void(const std::optional<ARObjectMeasurement>& /* result */)>
+  Func_void_std__optional_ARObjectMeasurement_ create_Func_void_std__optional_ARObjectMeasurement_(void* NON_NULL swiftClosureWrapper) noexcept {
+    auto swiftClosure = NitroAR::Func_void_std__optional_ARObjectMeasurement_::fromUnsafe(swiftClosureWrapper);
+    return [swiftClosure = std::move(swiftClosure)](const std::optional<ARObjectMeasurement>& result) mutable -> void {
+      swiftClosure.call(result);
+    };
   }
   
   // pragma MARK: std::shared_ptr<HybridARViewSpec>

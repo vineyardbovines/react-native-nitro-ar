@@ -542,6 +542,59 @@ open class HybridARViewSpec_cxx {
     }
   }
   
+  @inline(__always)
+  public final func segmentObject(x: Double, y: Double) -> bridge.Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____ {
+    do {
+      let __result = try self.__implementation.segmentObject(x: x, y: y)
+      let __resultCpp = { () -> bridge.std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec____ in
+        let __promise = bridge.create_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec____()
+        let __promiseHolder = bridge.wrap_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec____(__promise)
+        __result
+          .then({ __result in __promiseHolder.resolve({ () -> bridge.std__optional_std__shared_ptr_HybridARSegmentationResultSpec__ in
+              if let __unwrappedValue = __result {
+                return bridge.create_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__({ () -> bridge.std__shared_ptr_HybridARSegmentationResultSpec_ in
+                  let __cxxWrapped = __unwrappedValue.getCxxWrapper()
+                  return __cxxWrapped.getCxxPart()
+                }())
+              } else {
+                return .init()
+              }
+            }()) })
+          .catch({ __error in __promiseHolder.reject(__error.toCpp()) })
+        return __promise
+      }()
+      return bridge.create_Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____(__exceptionPtr)
+    }
+  }
+  
+  @inline(__always)
+  public final func measureObject(x: Double, y: Double) -> bridge.Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____ {
+    do {
+      let __result = try self.__implementation.measureObject(x: x, y: y)
+      let __resultCpp = { () -> bridge.std__shared_ptr_Promise_std__optional_ARObjectMeasurement___ in
+        let __promise = bridge.create_std__shared_ptr_Promise_std__optional_ARObjectMeasurement___()
+        let __promiseHolder = bridge.wrap_std__shared_ptr_Promise_std__optional_ARObjectMeasurement___(__promise)
+        __result
+          .then({ __result in __promiseHolder.resolve({ () -> bridge.std__optional_ARObjectMeasurement_ in
+              if let __unwrappedValue = __result {
+                return bridge.create_std__optional_ARObjectMeasurement_(__unwrappedValue)
+              } else {
+                return .init()
+              }
+            }()) })
+          .catch({ __error in __promiseHolder.reject(__error.toCpp()) })
+        return __promise
+      }()
+      return bridge.create_Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____(__resultCpp)
+    } catch (let __error) {
+      let __exceptionPtr = __error.toCpp()
+      return bridge.create_Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____(__exceptionPtr)
+    }
+  }
+  
   public final func getView() -> UnsafeMutableRawPointer {
     return Unmanaged.passRetained(__implementation.view).toOpaque()
   }

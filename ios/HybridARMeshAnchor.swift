@@ -34,12 +34,17 @@ final class HybridARMeshAnchor: HybridARMeshAnchorSpec {
 
     var vertices: [Double] {
         let geo = anchor.geometry
-        let vertexBuffer = geo.vertices
+        let vertexSource = geo.vertices
         var result: [Double] = []
-        result.reserveCapacity(vertexBuffer.count * 3)
+        result.reserveCapacity(vertexSource.count * 3)
 
-        for i in 0..<vertexBuffer.count {
-            let vertex = vertexBuffer[i]
+        let buffer = vertexSource.buffer
+        let stride = vertexSource.stride
+        let offset = vertexSource.offset
+
+        for i in 0..<vertexSource.count {
+            let vertexPointer = buffer.contents().advanced(by: offset + stride * i)
+            let vertex = vertexPointer.assumingMemoryBound(to: SIMD3<Float>.self).pointee
             result.append(Double(vertex.x))
             result.append(Double(vertex.y))
             result.append(Double(vertex.z))
@@ -49,27 +54,44 @@ final class HybridARMeshAnchor: HybridARMeshAnchorSpec {
 
     var faces: [Double] {
         let geo = anchor.geometry
-        let faceBuffer = geo.faces
+        let faceElement = geo.faces
         var result: [Double] = []
-        result.reserveCapacity(faceBuffer.count * 3)
+        result.reserveCapacity(faceElement.count * 3)
 
-        for i in 0..<faceBuffer.count {
-            let indices = faceBuffer.vertexIndicesOf(faceWithIndex: i)
-            result.append(Double(indices[0]))
-            result.append(Double(indices[1]))
-            result.append(Double(indices[2]))
+        let buffer = faceElement.buffer
+        let bytesPerIndex = faceElement.bytesPerIndex
+
+        for i in 0..<faceElement.count {
+            let facePointer = buffer.contents().advanced(by: bytesPerIndex * 3 * i)
+
+            if bytesPerIndex == 4 {
+                let indices = facePointer.assumingMemoryBound(to: UInt32.self)
+                result.append(Double(indices[0]))
+                result.append(Double(indices[1]))
+                result.append(Double(indices[2]))
+            } else if bytesPerIndex == 2 {
+                let indices = facePointer.assumingMemoryBound(to: UInt16.self)
+                result.append(Double(indices[0]))
+                result.append(Double(indices[1]))
+                result.append(Double(indices[2]))
+            }
         }
         return result
     }
 
     var normals: [Double] {
         let geo = anchor.geometry
-        let normalBuffer = geo.normals
+        let normalSource = geo.normals
         var result: [Double] = []
-        result.reserveCapacity(normalBuffer.count * 3)
+        result.reserveCapacity(normalSource.count * 3)
 
-        for i in 0..<normalBuffer.count {
-            let normal = normalBuffer[i]
+        let buffer = normalSource.buffer
+        let stride = normalSource.stride
+        let offset = normalSource.offset
+
+        for i in 0..<normalSource.count {
+            let normalPointer = buffer.contents().advanced(by: offset + stride * i)
+            let normal = normalPointer.assumingMemoryBound(to: SIMD3<Float>.self).pointee
             result.append(Double(normal.x))
             result.append(Double(normal.y))
             result.append(Double(normal.z))
@@ -79,15 +101,21 @@ final class HybridARMeshAnchor: HybridARMeshAnchorSpec {
 
     var classifications: [MeshClassification] {
         let geo = anchor.geometry
-        guard let classBuffer = geo.classification else {
+        guard let classSource = geo.classification else {
             return []
         }
 
         var result: [MeshClassification] = []
-        result.reserveCapacity(classBuffer.count)
+        result.reserveCapacity(classSource.count)
 
-        for i in 0..<classBuffer.count {
-            let arClass = classBuffer[i]
+        let buffer = classSource.buffer
+        let stride = classSource.stride
+        let offset = classSource.offset
+
+        for i in 0..<classSource.count {
+            let classPointer = buffer.contents().advanced(by: offset + stride * i)
+            let classValue = classPointer.assumingMemoryBound(to: UInt8.self).pointee
+            let arClass = ARMeshClassification(rawValue: Int(classValue)) ?? .none
             result.append(mapClassification(arClass))
         }
         return result

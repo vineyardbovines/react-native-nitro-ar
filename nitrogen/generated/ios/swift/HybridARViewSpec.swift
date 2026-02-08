@@ -37,6 +37,8 @@ public protocol HybridARViewSpec_protocol: HybridObject, HybridView {
   func pauseSession() throws -> Void
   func resetSession() throws -> Void
   func isLiDARAvailable() throws -> Bool
+  func segmentObject(x: Double, y: Double) throws -> Promise<(any HybridARSegmentationResultSpec)?>
+  func measureObject(x: Double, y: Double) throws -> Promise<ARObjectMeasurement?>
 }
 
 public extension HybridARViewSpec_protocol {

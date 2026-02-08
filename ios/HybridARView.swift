@@ -2,6 +2,7 @@ import ARKit
 import SceneKit
 import UIKit
 import NitroModules
+import Vision
 
 class HybridARView: HybridARViewSpec {
     // The underlying AR view
@@ -90,13 +91,8 @@ class HybridARView: HybridARViewSpec {
     }
 
     private func updateOcclusionSettings() {
-        #if !targetEnvironment(simulator)
-        if #available(iOS 13.0, *) {
-            if peopleOcclusion == true {
-                arView.environment.sceneUnderstanding.options.insert(.occlusion)
-            }
-        }
-        #endif
+        // Occlusion is configured via frameSemantics in startSession/resetSession
+        // ARSCNView doesn't have an environment property like RealityKit's ARView
     }
 
     private func updateDebugOptions() {
@@ -200,6 +196,102 @@ class HybridARView: HybridARViewSpec {
             return ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh)
         }
         return false
+    }
+
+    // MARK: - Object Segmentation & Measurement
+
+    func segmentObject(x: Double, y: Double) throws -> Promise<(any HybridARSegmentationResultSpec)?> {
+        return Promise.async { [weak self] in
+            guard let self = self else { return nil }
+
+            guard #available(iOS 17.0, *) else {
+                return nil
+            }
+
+            guard let frame = self.arView.session.currentFrame else {
+                return nil
+            }
+
+            // Convert normalized coordinates to pixel coordinates
+            let imageSize = CGSize(
+                width: CVPixelBufferGetWidth(frame.capturedImage),
+                height: CVPixelBufferGetHeight(frame.capturedImage)
+            )
+            let point = CGPoint(x: x * imageSize.width, y: y * imageSize.height)
+
+            // Perform instance segmentation
+            let request = VNGenerateForegroundInstanceMaskRequest()
+            let handler = VNImageRequestHandler(cvPixelBuffer: frame.capturedImage, orientation: .right)
+
+            try handler.perform([request])
+
+            guard let observation = request.results?.first else {
+                return nil
+            }
+
+            // Find which instance contains the tapped point
+            let instances = observation.allInstances
+            var selectedIndex: Int?
+
+            for index in instances {
+                if let maskBuffer = try? observation.generateScaledMaskForImage(
+                    forInstances: IndexSet(integer: index),
+                    from: handler
+                ) {
+                    CVPixelBufferLockBaseAddress(maskBuffer, .readOnly)
+                    defer { CVPixelBufferUnlockBaseAddress(maskBuffer, .readOnly) }
+
+                    let maskWidth = CVPixelBufferGetWidth(maskBuffer)
+                    let maskHeight = CVPixelBufferGetHeight(maskBuffer)
+                    let bytesPerRow = CVPixelBufferGetBytesPerRow(maskBuffer)
+
+                    guard let baseAddress = CVPixelBufferGetBaseAddress(maskBuffer) else { continue }
+
+                    let buffer = baseAddress.assumingMemoryBound(to: UInt8.self)
+                    let maskX = Int(point.x * CGFloat(maskWidth) / imageSize.width)
+                    let maskY = Int(point.y * CGFloat(maskHeight) / imageSize.height)
+
+                    if maskX >= 0, maskX < maskWidth, maskY >= 0, maskY < maskHeight {
+                        let pixelValue = buffer[maskY * bytesPerRow + maskX]
+                        if pixelValue > 127 {
+                            selectedIndex = index
+                            break
+                        }
+                    }
+                }
+            }
+
+            guard let index = selectedIndex else {
+                return nil
+            }
+
+            return HybridARSegmentationResult(
+                mask: observation,
+                selectedIndex: index,
+                frame: frame,
+                sceneView: self.arView
+            )
+        }
+    }
+
+    func measureObject(x: Double, y: Double) throws -> Promise<ARObjectMeasurement?> {
+        return Promise.async { [weak self] in
+            guard let self = self else { return nil }
+
+            guard #available(iOS 17.0, *) else {
+                return nil
+            }
+
+            // First segment the object
+            let segmentationResult = try await self.segmentObject(x: x, y: y).await()
+
+            guard let segmentation = segmentationResult as? HybridARSegmentationResult else {
+                return nil
+            }
+
+            // Then measure it
+            return try segmentation.measure()
+        }
     }
 
     // MARK: - Session Control

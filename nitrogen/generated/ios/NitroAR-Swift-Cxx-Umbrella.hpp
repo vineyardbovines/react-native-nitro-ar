@@ -8,6 +8,8 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `ARObjectMeasurement` to properly resolve imports.
+namespace margelo::nitro::ar { struct ARObjectMeasurement; }
 // Forward declaration of `ARSessionConfiguration` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARSessionConfiguration; }
 // Forward declaration of `ARViewHitResult` to properly resolve imports.
@@ -38,6 +40,8 @@ namespace margelo::nitro::ar { class HybridARPlaneAnchorSpec; }
 namespace margelo::nitro::ar { class HybridARPlaneGeometrySpec; }
 // Forward declaration of `HybridARRaycastResultSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARRaycastResultSpec; }
+// Forward declaration of `HybridARSegmentationResultSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARSegmentationResultSpec; }
 // Forward declaration of `HybridARSessionSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARSessionSpec; }
 // Forward declaration of `HybridARViewSpec` to properly resolve imports.
@@ -74,6 +78,7 @@ namespace margelo::nitro::ar { enum class WorldAlignment; }
 namespace margelo::nitro::ar { enum class WorldMappingStatus; }
 
 // Include C++ defined types
+#include "ARObjectMeasurement.hpp"
 #include "ARSessionConfiguration.hpp"
 #include "ARViewHitResult.hpp"
 #include "CameraPose.hpp"
@@ -89,6 +94,7 @@ namespace margelo::nitro::ar { enum class WorldMappingStatus; }
 #include "HybridARPlaneAnchorSpec.hpp"
 #include "HybridARPlaneGeometrySpec.hpp"
 #include "HybridARRaycastResultSpec.hpp"
+#include "HybridARSegmentationResultSpec.hpp"
 #include "HybridARSessionSpec.hpp"
 #include "HybridARViewSpec.hpp"
 #include "HybridARVolumeSpec.hpp"
@@ -147,6 +153,8 @@ namespace NitroAR { class HybridARPlaneAnchorSpec_cxx; }
 namespace NitroAR { class HybridARPlaneGeometrySpec_cxx; }
 // Forward declaration of `HybridARRaycastResultSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARRaycastResultSpec_cxx; }
+// Forward declaration of `HybridARSegmentationResultSpec_cxx` to properly resolve imports.
+namespace NitroAR { class HybridARSegmentationResultSpec_cxx; }
 // Forward declaration of `HybridARSessionSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARSessionSpec_cxx; }
 // Forward declaration of `HybridARViewSpec_cxx` to properly resolve imports.

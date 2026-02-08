@@ -8,6 +8,8 @@
 #pragma once
 
 // Forward declarations of C++ defined types
+// Forward declaration of `ARObjectMeasurement` to properly resolve imports.
+namespace margelo::nitro::ar { struct ARObjectMeasurement; }
 // Forward declaration of `ARSessionConfiguration` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARSessionConfiguration; }
 // Forward declaration of `ARViewHitResult` to properly resolve imports.
@@ -38,6 +40,8 @@ namespace margelo::nitro::ar { class HybridARPlaneAnchorSpec; }
 namespace margelo::nitro::ar { class HybridARPlaneGeometrySpec; }
 // Forward declaration of `HybridARRaycastResultSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARRaycastResultSpec; }
+// Forward declaration of `HybridARSegmentationResultSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARSegmentationResultSpec; }
 // Forward declaration of `HybridARSessionSpec` to properly resolve imports.
 namespace margelo::nitro::ar { class HybridARSessionSpec; }
 // Forward declaration of `HybridARViewSpec` to properly resolve imports.
@@ -84,6 +88,8 @@ namespace NitroAR { class HybridARPlaneAnchorSpec_cxx; }
 namespace NitroAR { class HybridARPlaneGeometrySpec_cxx; }
 // Forward declaration of `HybridARRaycastResultSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARRaycastResultSpec_cxx; }
+// Forward declaration of `HybridARSegmentationResultSpec_cxx` to properly resolve imports.
+namespace NitroAR { class HybridARSegmentationResultSpec_cxx; }
 // Forward declaration of `HybridARSessionSpec_cxx` to properly resolve imports.
 namespace NitroAR { class HybridARSessionSpec_cxx; }
 // Forward declaration of `HybridARViewSpec_cxx` to properly resolve imports.
@@ -94,6 +100,7 @@ namespace NitroAR { class HybridARVolumeSpec_cxx; }
 namespace NitroAR { class HybridARWorldMapSpec_cxx; }
 
 // Include C++ defined types
+#include "ARObjectMeasurement.hpp"
 #include "ARSessionConfiguration.hpp"
 #include "ARViewHitResult.hpp"
 #include "CameraPose.hpp"
@@ -109,6 +116,7 @@ namespace NitroAR { class HybridARWorldMapSpec_cxx; }
 #include "HybridARPlaneAnchorSpec.hpp"
 #include "HybridARPlaneGeometrySpec.hpp"
 #include "HybridARRaycastResultSpec.hpp"
+#include "HybridARSegmentationResultSpec.hpp"
 #include "HybridARSessionSpec.hpp"
 #include "HybridARViewSpec.hpp"
 #include "HybridARVolumeSpec.hpp"
@@ -341,6 +349,51 @@ namespace margelo::nitro::ar::bridge::swift {
   // pragma MARK: std::weak_ptr<HybridARMeasurementSpec>
   using std__weak_ptr_HybridARMeasurementSpec_ = std::weak_ptr<HybridARMeasurementSpec>;
   inline std__weak_ptr_HybridARMeasurementSpec_ weakify_std__shared_ptr_HybridARMeasurementSpec_(const std::shared_ptr<HybridARMeasurementSpec>& strong) noexcept { return strong; }
+  
+  // pragma MARK: std::optional<ARObjectMeasurement>
+  /**
+   * Specialized version of `std::optional<ARObjectMeasurement>`.
+   */
+  using std__optional_ARObjectMeasurement_ = std::optional<ARObjectMeasurement>;
+  inline std::optional<ARObjectMeasurement> create_std__optional_ARObjectMeasurement_(const ARObjectMeasurement& value) noexcept {
+    return std::optional<ARObjectMeasurement>(value);
+  }
+  inline bool has_value_std__optional_ARObjectMeasurement_(const std::optional<ARObjectMeasurement>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline ARObjectMeasurement get_std__optional_ARObjectMeasurement_(const std::optional<ARObjectMeasurement>& optional) noexcept {
+    return *optional;
+  }
+  
+  // pragma MARK: std::shared_ptr<HybridARSegmentationResultSpec>
+  /**
+   * Specialized version of `std::shared_ptr<HybridARSegmentationResultSpec>`.
+   */
+  using std__shared_ptr_HybridARSegmentationResultSpec_ = std::shared_ptr<HybridARSegmentationResultSpec>;
+  std::shared_ptr<HybridARSegmentationResultSpec> create_std__shared_ptr_HybridARSegmentationResultSpec_(void* NON_NULL swiftUnsafePointer) noexcept;
+  void* NON_NULL get_std__shared_ptr_HybridARSegmentationResultSpec_(std__shared_ptr_HybridARSegmentationResultSpec_ cppType);
+  
+  // pragma MARK: std::weak_ptr<HybridARSegmentationResultSpec>
+  using std__weak_ptr_HybridARSegmentationResultSpec_ = std::weak_ptr<HybridARSegmentationResultSpec>;
+  inline std__weak_ptr_HybridARSegmentationResultSpec_ weakify_std__shared_ptr_HybridARSegmentationResultSpec_(const std::shared_ptr<HybridARSegmentationResultSpec>& strong) noexcept { return strong; }
+  
+  // pragma MARK: Result<std::vector<double>>
+  using Result_std__vector_double__ = Result<std::vector<double>>;
+  inline Result_std__vector_double__ create_Result_std__vector_double__(const std::vector<double>& value) noexcept {
+    return Result<std::vector<double>>::withValue(value);
+  }
+  inline Result_std__vector_double__ create_Result_std__vector_double__(const std::exception_ptr& error) noexcept {
+    return Result<std::vector<double>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::optional<ARObjectMeasurement>>
+  using Result_std__optional_ARObjectMeasurement__ = Result<std::optional<ARObjectMeasurement>>;
+  inline Result_std__optional_ARObjectMeasurement__ create_Result_std__optional_ARObjectMeasurement__(const std::optional<ARObjectMeasurement>& value) noexcept {
+    return Result<std::optional<ARObjectMeasurement>>::withValue(value);
+  }
+  inline Result_std__optional_ARObjectMeasurement__ create_Result_std__optional_ARObjectMeasurement__(const std::exception_ptr& error) noexcept {
+    return Result<std::optional<ARObjectMeasurement>>::withError(error);
+  }
   
   // pragma MARK: std::shared_ptr<HybridARPlaneGeometrySpec>
   /**
@@ -901,6 +954,89 @@ namespace margelo::nitro::ar::bridge::swift {
     return *optional;
   }
   
+  // pragma MARK: std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>
+  /**
+   * Specialized version of `std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>`.
+   */
+  using std__optional_std__shared_ptr_HybridARSegmentationResultSpec__ = std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>;
+  inline std::optional<std::shared_ptr<HybridARSegmentationResultSpec>> create_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__(const std::shared_ptr<HybridARSegmentationResultSpec>& value) noexcept {
+    return std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>(value);
+  }
+  inline bool has_value_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& optional) noexcept {
+    return optional.has_value();
+  }
+  inline std::shared_ptr<HybridARSegmentationResultSpec> get_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& optional) noexcept {
+    return *optional;
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>`.
+   */
+  using std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec____ = std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>;
+  inline std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>> create_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec____() noexcept {
+    return Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>::create();
+  }
+  inline PromiseHolder<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>> wrap_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec____(std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>> promise) noexcept {
+    return PromiseHolder<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>&)>`.
+   */
+  using Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__ = std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec___Wrapper final {
+  public:
+    explicit Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec___Wrapper(std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& /* result */)>&& func): _function(std::make_unique<std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& /* result */)>>(std::move(func))) {}
+    inline void call(std::optional<std::shared_ptr<HybridARSegmentationResultSpec>> result) const noexcept {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__ create_Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec___Wrapper wrap_Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__(Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec__ value) noexcept {
+    return Func_void_std__optional_std__shared_ptr_HybridARSegmentationResultSpec___Wrapper(std::move(value));
+  }
+  
+  // pragma MARK: std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>
+  /**
+   * Specialized version of `std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>`.
+   */
+  using std__shared_ptr_Promise_std__optional_ARObjectMeasurement___ = std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>;
+  inline std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>> create_std__shared_ptr_Promise_std__optional_ARObjectMeasurement___() noexcept {
+    return Promise<std::optional<ARObjectMeasurement>>::create();
+  }
+  inline PromiseHolder<std::optional<ARObjectMeasurement>> wrap_std__shared_ptr_Promise_std__optional_ARObjectMeasurement___(std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>> promise) noexcept {
+    return PromiseHolder<std::optional<ARObjectMeasurement>>(std::move(promise));
+  }
+  
+  // pragma MARK: std::function<void(const std::optional<ARObjectMeasurement>& /* result */)>
+  /**
+   * Specialized version of `std::function<void(const std::optional<ARObjectMeasurement>&)>`.
+   */
+  using Func_void_std__optional_ARObjectMeasurement_ = std::function<void(const std::optional<ARObjectMeasurement>& /* result */)>;
+  /**
+   * Wrapper class for a `std::function<void(const std::optional<ARObjectMeasurement>& / * result * /)>`, this can be used from Swift.
+   */
+  class Func_void_std__optional_ARObjectMeasurement__Wrapper final {
+  public:
+    explicit Func_void_std__optional_ARObjectMeasurement__Wrapper(std::function<void(const std::optional<ARObjectMeasurement>& /* result */)>&& func): _function(std::make_unique<std::function<void(const std::optional<ARObjectMeasurement>& /* result */)>>(std::move(func))) {}
+    inline void call(std::optional<ARObjectMeasurement> result) const noexcept {
+      _function->operator()(result);
+    }
+  private:
+    std::unique_ptr<std::function<void(const std::optional<ARObjectMeasurement>& /* result */)>> _function;
+  } SWIFT_NONCOPYABLE;
+  Func_void_std__optional_ARObjectMeasurement_ create_Func_void_std__optional_ARObjectMeasurement_(void* NON_NULL swiftClosureWrapper) noexcept;
+  inline Func_void_std__optional_ARObjectMeasurement__Wrapper wrap_Func_void_std__optional_ARObjectMeasurement_(Func_void_std__optional_ARObjectMeasurement_ value) noexcept {
+    return Func_void_std__optional_ARObjectMeasurement__Wrapper(std::move(value));
+  }
+  
   // pragma MARK: std::shared_ptr<HybridARViewSpec>
   /**
    * Specialized version of `std::shared_ptr<HybridARViewSpec>`.
@@ -929,6 +1065,24 @@ namespace margelo::nitro::ar::bridge::swift {
   }
   inline Result_bool_ create_Result_bool_(const std::exception_ptr& error) noexcept {
     return Result<bool>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>>
+  using Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____ = Result<std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>>;
+  inline Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____ create_Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____(const std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>& value) noexcept {
+    return Result<std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____ create_Result_std__shared_ptr_Promise_std__optional_std__shared_ptr_HybridARSegmentationResultSpec_____(const std::exception_ptr& error) noexcept {
+    return Result<std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>>>::withError(error);
+  }
+  
+  // pragma MARK: Result<std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>>
+  using Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____ = Result<std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>>;
+  inline Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____ create_Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____(const std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>& value) noexcept {
+    return Result<std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>>::withValue(value);
+  }
+  inline Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____ create_Result_std__shared_ptr_Promise_std__optional_ARObjectMeasurement____(const std::exception_ptr& error) noexcept {
+    return Result<std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>>>::withError(error);
   }
 
 } // namespace margelo::nitro::ar::bridge::swift

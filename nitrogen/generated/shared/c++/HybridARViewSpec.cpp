@@ -49,6 +49,8 @@ namespace margelo::nitro::ar {
       prototype.registerHybridMethod("pauseSession", &HybridARViewSpec::pauseSession);
       prototype.registerHybridMethod("resetSession", &HybridARViewSpec::resetSession);
       prototype.registerHybridMethod("isLiDARAvailable", &HybridARViewSpec::isLiDARAvailable);
+      prototype.registerHybridMethod("segmentObject", &HybridARViewSpec::segmentObject);
+      prototype.registerHybridMethod("measureObject", &HybridARViewSpec::measureObject);
     });
   }
 

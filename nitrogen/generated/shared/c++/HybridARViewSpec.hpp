@@ -17,11 +17,19 @@
 namespace margelo::nitro::ar { enum class SceneReconstructionMode; }
 // Forward declaration of `ARViewHitResult` to properly resolve imports.
 namespace margelo::nitro::ar { struct ARViewHitResult; }
+// Forward declaration of `HybridARSegmentationResultSpec` to properly resolve imports.
+namespace margelo::nitro::ar { class HybridARSegmentationResultSpec; }
+// Forward declaration of `ARObjectMeasurement` to properly resolve imports.
+namespace margelo::nitro::ar { struct ARObjectMeasurement; }
 
 #include <optional>
 #include "SceneReconstructionMode.hpp"
 #include <string>
 #include "ARViewHitResult.hpp"
+#include <memory>
+#include "HybridARSegmentationResultSpec.hpp"
+#include <NitroModules/Promise.hpp>
+#include "ARObjectMeasurement.hpp"
 
 namespace margelo::nitro::ar {
 
@@ -88,6 +96,8 @@ namespace margelo::nitro::ar {
       virtual void pauseSession() = 0;
       virtual void resetSession() = 0;
       virtual bool isLiDARAvailable() = 0;
+      virtual std::shared_ptr<Promise<std::optional<std::shared_ptr<HybridARSegmentationResultSpec>>>> segmentObject(double x, double y) = 0;
+      virtual std::shared_ptr<Promise<std::optional<ARObjectMeasurement>>> measureObject(double x, double y) = 0;
 
     protected:
       // Hybrid Setup

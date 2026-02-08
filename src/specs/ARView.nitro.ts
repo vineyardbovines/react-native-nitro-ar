@@ -1,4 +1,5 @@
 import type { HybridView, HybridViewMethods, HybridViewProps } from "react-native-nitro-modules";
+import type { ARObjectMeasurement, ARSegmentationResult } from "./ARObjectMeasurement.nitro";
 import type { SceneReconstructionMode } from "./ARSceneMesh.nitro";
 
 export interface ARViewHitResult {
@@ -79,6 +80,12 @@ export interface ARViewMethods extends HybridViewMethods {
   // LiDAR
   /** Check if LiDAR is available on this device */
   isLiDARAvailable(): boolean;
+
+  // Object Measurement (iOS 17+)
+  /** Segment an object at the given screen point (normalized 0-1) */
+  segmentObject(x: number, y: number): Promise<ARSegmentationResult | undefined>;
+  /** Measure an object at the given screen point - combines segmentation + depth + bounding box */
+  measureObject(x: number, y: number): Promise<ARObjectMeasurement | undefined>;
 }
 
 export type ARView = HybridView<ARViewProps, ARViewMethods, { ios: "swift" }>;
